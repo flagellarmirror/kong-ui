@@ -69,20 +69,6 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
         $url = $getKongConfig()."/services/".$params['id'];
         $resp = $utils->apicall($url,'delete');
 
-        // $ch = curl_init();
-        // $api['url']=$api['url'].$params['id'];
-        // curl_setopt($ch, CURLOPT_URL, $api['url']);
-        // curl_setopt($ch, CURLOPT_POST, 1);
-        // curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        // $output = curl_exec($ch);
-        // curl_close($ch);
-        // $httpcode = curl_getinfo($ch);
-        // if($httpcode['http_code']!=204) {
-        //     $output=json_decode($output,true);
-        //     throw new Exception($output['message']);
-        // }
-
         $response->getBody()->write($resp);
         return $response->withStatus(200)
                         ->withHeader("Content-Type", "application/json");
@@ -128,6 +114,20 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
         $url = $update ? $getKongConfig()."/routes/".$params['id'] : $getKongConfig()."/routes/";
         $method = $update ? 'patch' : 'post';
         $resp = $utils->apicall($url,$method,$params);
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->delete('/routes', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
+
+        $url = $getKongConfig()."/routes/".$params['id'];
+        $resp = $utils->apicall($url,'delete');
 
         $response->getBody()->write($resp);
         return $response->withStatus(200)
