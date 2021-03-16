@@ -1,0 +1,21 @@
+
+#compiled
+var/logs/*
+!var/logs/.htaccess
+
+# Logs files
+*.log
+
+# Zipped files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Ingore all lib e vendor file
+/vendor/*
+composer.lock
