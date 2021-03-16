@@ -31,7 +31,10 @@
             <tr>
                 <template v-for="(header,i) in headers">
                     <td :key="i" v-if="i==0" style="text-align:center">
-                        <v-btn icon>
+                        <v-btn
+                            icon
+                            @click="deleteRow(index)"
+                        >
                             <v-icon>mdi-delete</v-icon>
                         </v-btn>
                         <v-btn
@@ -120,6 +123,25 @@ module.exports = {
     methods: {
         sendEvent:function(index){
             this.$emit('event',this.routes[index].id)
+        },
+        deleteRow:function(index){
+            var self=this
+
+            var params={
+                id: this.routes[index].id
+            }
+            Utils.apiCall("delete", "/kong/routes",params)
+            .then(function (response) {
+                if(response!=undefined){
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Route delete',
+                        text: 'Route delete',
+                    }).then(function(result) {
+                        self.getRoutes()
+                    })
+                }
+            });
         },
         getRoutes:function(){
             var self=this
