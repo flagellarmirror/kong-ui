@@ -98,9 +98,10 @@ module.exports = {
     props:['item'],
     methods: {
         sendEvent:function(index){
+            console.log("invio evento")
             this.$emit('event',this.routes[index].id)
         },
-        getRoutes:function(){
+        getPlugins:function(){
             var self=this
             Utils.apiCall("get", "/kong/plugins")
             .then(function (response) {
@@ -118,7 +119,7 @@ module.exports = {
         }
     },
     created:function() {
-        this.getRoutes();
+        this.getPlugins();
     },
 }
 </script>

@@ -122,7 +122,6 @@ module.exports = {
     props:['item'],
     methods: {
         sendEvent:function(index){
-            console.log("invio evento")
             this.$emit('event',this.routes[index].id)
         },
         deleteRow:function(index){

@@ -122,12 +122,12 @@ module.exports = {
                         title: 'Service delete',
                         text: 'Service delete',
                     }).then(function(result) {
-                        self.loadData()
+                        self.getServices()
                     })
                 }
             });
         },
-        loadData:function(){
+        getServices:function(){
             var self=this
 
             Utils.apiCall("get", "/kong/services")
@@ -137,7 +137,7 @@ module.exports = {
         },
     },
     created:function() {
-        this.loadData()
+        this.getServices()
     },
 }
 </script>

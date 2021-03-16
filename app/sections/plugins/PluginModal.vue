@@ -199,9 +199,9 @@ module.exports={
     computed:{
         modalTitle(){
             if(this.item.id!=null){
-                return 'Modify service: '+this.item.id
+                return 'Modify plugin: '+this.item.id
             }else{
-                return "Create service"
+                return "Create plugin"
             }
 
         },
@@ -250,32 +250,31 @@ module.exports={
                     self.form.host=response.data.host
                     self.form.port=response.data.port
                     self.form.path=response.data.path
-                    self.getRoutes()
                 });
             }
         },
-        getRoutes:function(){
-            var self=this
-            Utils.apiCall("get", "/kong/routes")
-            .then(function (response) {
-                var tmp=[]
-                for(var i=0;i<response.data.data.length;i++){
-                    if(response.data.data[i].paths!=null){
-                        response.data.data[i].paths=response.data.data[i].paths.join(";")
-                    }
-                    if(response.data.data[i].methods!=null){
-                        response.data.data[i].methods=response.data.data[i].methods.join(";")
-                    }
-                    if(response.data.data[i].service.id==self.item.id){
-                        tmp.push(response.data.data[i])
-                    }
-                }
-                self.routes=tmp
-            });
-        }
+        // getRoutes:function(){
+        //     var self=this
+        //     Utils.apiCall("get", "/kong/routes")
+        //     .then(function (response) {
+        //         var tmp=[]
+        //         for(var i=0;i<response.data.data.length;i++){
+        //             if(response.data.data[i].paths!=null){
+        //                 response.data.data[i].paths=response.data.data[i].paths.join(";")
+        //             }
+        //             if(response.data.data[i].methods!=null){
+        //                 response.data.data[i].methods=response.data.data[i].methods.join(";")
+        //             }
+        //             if(response.data.data[i].service.id==self.item.id){
+        //                 tmp.push(response.data.data[i])
+        //             }
+        //         }
+        //         self.routes=tmp
+        //     });
+        // }
     },
     created:function() {
-        this.loadData()
+        // this.loadData()
     },
     components:{
         'routes-table': httpVueLoader('./../tables/routesTable.vue' + '?v=' + new Date().getTime()),

@@ -15,6 +15,13 @@
             :item="select"
         ></route-modal>
 
+        <!-- Plugin modal -->
+        <plugin-modal
+            v-if="pluginModal"
+            @close-modal="closePluginModal($event)"
+            :item="select"
+        ></plugin-modal>
+
         <services-table
             ref="services"
             @open-service-modal="openServiceModal($event)"
@@ -29,6 +36,7 @@ module.exports={
         return{
             serviceModal: false,
             routeModal: false,
+            pluginModal: false,
             select:null,
             services:[],
             headers: [
@@ -93,10 +101,21 @@ module.exports={
             this.serviceModal=false
             this.select=null
             if(event.event==undefined){ //Close modal
-                if(event.refresh) this.$refs.services.loadData()
+                if(event.refresh) this.$refs.services.getServices()
             }else if(event.event=='editRoute'){
                 this.openRouteModal(event.data)
+            }else if(event.event=='editPlugin'){
+                console.log("arrivato")
+                this.openPluginModal(event.data)
             }
+        },
+        openPluginModal:function(data){
+            this.select=data
+            this.pluginModal=true
+        },
+        closePluginModal:function(){
+            this.pluginModal=false
+            this.select=null
         },
         openRouteModal:function(data){
             this.select=data
@@ -106,7 +125,7 @@ module.exports={
             this.routeModal=false
             this.select=null
             if(event.event==undefined){ //Close modal
-                if(event.refresh) this.$refs.services.loadData()
+                if(event.refresh) this.$refs.services.getServices()
             }else if(event.event=='editRoute'){
                 // this.select=event.id
                 // this.openRouteModal(event.id)
@@ -116,7 +135,8 @@ module.exports={
     components:{
         'services-table': httpVueLoader('./../tables/servicesTable.vue' + '?v=' + new Date().getTime()),
         'service-modal': httpVueLoader('./ServiceModal.vue' + '?v=' + new Date().getTime()),
-        'route-modal': httpVueLoader('./../routes/RouteModal.vue' + '?v=' + new Date().getTime())
+        'route-modal': httpVueLoader('./../routes/RouteModal.vue' + '?v=' + new Date().getTime()),
+        'plugin-modal': httpVueLoader('./../plugins/PluginModal.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

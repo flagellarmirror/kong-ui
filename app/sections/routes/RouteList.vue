@@ -88,8 +88,6 @@ module.exports={
             this.routeModal=true
         },
         closeRouteModal:function(event){
-            console.log("quii")
-            console.log(event)
             this.routeModal=false
             this.select=null
             if(event.event==undefined){ //Close modal
