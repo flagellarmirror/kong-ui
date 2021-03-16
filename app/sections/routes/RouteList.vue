@@ -11,7 +11,7 @@
         <routes-table
             ref="routes"
             :item="{hide_link:false, hide_new_row:true}"
-            @open-route-modal="openRouteModal($event)"
+            @event="openRouteModal($event)"
         ></routes-table>
 
     </div>
@@ -82,14 +82,22 @@ module.exports={
     },
     methods: {
         openRouteModal:function(id){
-            if(index!=undefined){
-                this.select=id
+            this.select={
+                id:id
             }
             this.routeModal=true
         },
         closeRouteModal:function(event){
+            console.log("quii")
+            console.log(event)
             this.routeModal=false
             this.select=null
+            if(event.event==undefined){ //Close modal
+                if(event.refresh) this.$refs.routes.getRoutes()
+            }
+            // else if(event.event=='editRoute'){
+            //     this.openRouteModal(event.data)
+            // }
         },
     },
     created:function() {
