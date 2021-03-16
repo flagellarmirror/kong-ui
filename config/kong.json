@@ -1,0 +1,13 @@
+{
+    "use_https":false,
+    "http":{
+        "host":"http://localhost",
+        "public":"8000",
+        "admin":"8001"
+    },
+    "https":{
+        "host":"https://localhost",
+        "public":"8443",
+        "admin":"8444"
+    }
+}

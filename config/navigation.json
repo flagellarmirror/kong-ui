@@ -1,0 +1,47 @@
+{
+
+    "bootstrapPage":{
+        "route": "/services",
+        "title": "Services"
+    },
+
+    "navigationMap" :
+    [
+        {
+            "title": "Services",
+            "subtitle": "Kong services",
+            "allowed":[],
+            "visible": true,
+
+            "action":{
+                "path": "/services",
+                "component": "../../app/sections/services/ServiceList.vue"
+            },
+
+            "layout":{
+                "icon":"mdi-view-dashboard-variant",
+                "disabled": false,
+                "color": "red--text",
+                "class": false
+            }
+        },
+        {
+            "title": "Routes",
+            "subtitle": "Kong routes",
+            "allowed":[],
+            "visible": true,
+
+            "action":{
+                "path": "/routes",
+                "component": "../../app/sections/routes/RouteList.vue"
+            },
+
+            "layout":{
+                "icon":"mdi-view-dashboard-variant",
+                "disabled": false,
+                "color": false,
+                "class": false
+            }
+        }
+    ]
+}
