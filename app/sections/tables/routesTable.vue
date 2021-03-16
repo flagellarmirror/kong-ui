@@ -63,7 +63,7 @@ module.exports = {
                     align: 'center',
                     sortable: false,
                     custom:{
-                        type:"btn"
+                        type: this.item.hide_new_row==undefined||!this.item.hide_new_row ? 'btn' : null
                     },
                     visible:true,
                 },

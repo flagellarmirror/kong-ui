@@ -303,15 +303,15 @@ module.exports={
 
             Utils.apiCall("post", "/kong/routes",params)
             .then(function (response) {
-                // if(response!=undefined){
-                //     Swal.fire({
-                //         type: 'success',
-                //         title: self.item==null ? 'New route create' : 'Route updated',
-                //         text: self.item==null ? 'New route create' : 'Route updated',
-                //     }).then(function(result) {
-                //         self.closeModal(true)
-                //     })
-                // }
+                if(response!=undefined){
+                    Swal.fire({
+                        type: 'success',
+                        title: self.item.id==null ? 'New route create' : 'Route updated',
+                        text: self.item.id==null ? 'New route create' : 'Route updated',
+                    }).then(function(result) {
+                        self.closeModal(true)
+                    })
+                }
             });
         },
         loadData:function(){
