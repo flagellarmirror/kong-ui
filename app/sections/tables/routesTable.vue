@@ -158,7 +158,7 @@ module.exports = {
                     if(self.item.id==null){
                         tmp.push(response.data.data[i])
                     }else{
-                        if(response.data.data[i].service.id==self.item.id){
+                        if(response.data.data[i].service.id==self.item.id||response.data.data[i].service.id==self.item.parent_id){
                             tmp.push(response.data.data[i])
                         }
                     }

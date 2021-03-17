@@ -17,75 +17,54 @@
             </v-toolbar>
 
             <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
-                <v-flex xs4 pr-2 pb-3>
+                <v-flex xs3 pr-2 pb-3>
                     <v-text-field
                         outlined
                         dense
                         hide-details
                         readonly
-                        label="Service id"
+                        label="Plugin id"
                         v-model="form.id"
                     ></v-text-field>
                 </v-flex>
-                <v-flex xs4 pl-2 pr-2 pb-3>
-                    <v-text-field
+                <v-flex xs3 pl-2 pr-2 pb-3>
+                    <!-- <v-text-field
                         outlined
                         dense
                         hide-details
                         label="Name"
                         v-model="form.name"
-                    ></v-text-field>
-                </v-flex>
-                <v-flex xs4 pl-2 pb-3>
-                    <v-text-field
+                    ></v-text-field> -->
+                    <v-select
                         outlined
                         dense
                         hide-details
-                        label="Protocol"
-                        v-model="form.protocol"
-                    ></v-text-field>
+                        label="Name"
+                        :items="name_items"
+                        v-model="form.name"
+                    ></v-select>
                 </v-flex>
-
-                <v-flex xs4 pr-2>
-                    <v-text-field
+                <v-flex xs3 pl-2 pr-2 pb-3>
+                    <v-select
                         outlined
                         dense
                         hide-details
-                        label="Host"
-                        v-model="form.host"
-                    ></v-text-field>
+                        label="Protocols"
+                        multiple
+                        :items="protocols_items"
+                        v-model="form.protocols"
+                    ></v-select>
                 </v-flex>
-                <v-flex xs4 pl-2 pr-2>
-                    <v-text-field
+                <v-flex xs3 pb-3>
+                    <v-select
                         outlined
                         dense
                         hide-details
-                        label="Port"
-                        v-model="form.port"
-                    ></v-text-field>
+                        label="Enabled"
+                        :items="[true,false]"
+                        v-model="form.enabled"
+                    ></v-select>
                 </v-flex>
-                <v-flex xs4 pl-2>
-                    <v-text-field
-                        outlined
-                        dense
-                        hide-details
-                        label="Path"
-                        v-model="form.path"
-                    ></v-text-field>
-                </v-flex>
-
-                <!-- <v-flex xs12 pt-2 pl-2>
-                    <v-divider></v-divider>
-                </v-flex> -->
-
-                <!-- <v-flex xs12 pt-2>
-                    <v-text-field
-                        outlined
-                        dense
-                        hide-details
-                        label="Link"
-                    ></v-text-field>
-                </v-flex> -->
             </v-layout>
 
             <v-card class="ma-2" v-if="item.id!=null">
@@ -102,17 +81,17 @@
                 </v-card-title>
 
                 <!-- Components -->
+                <services-table
+                    v-if="type=='services'"
+                    :item="item"
+                    @event="closeModal(false,'editService',$event)"
+                ></services-table>
+
                 <routes-table
                     v-if="type=='routes'"
                     :item="item"
                     @event="closeModal(false,'editRoute',$event)"
                 ></routes-table>
-
-                <plugins-table
-                    v-if="type=='plugins'"
-                    :item="item"
-                    @event="closeModal(false,'editPlugin',$event)"
-                ></plugins-table>
 
             </v-card>
 
@@ -136,15 +115,25 @@ module.exports={
             form:{
                 id:null,
                 name:null,
-                protocol:null,
+                protocols:null,
+                enabled:null,
                 host:null,
                 port:null,
                 path:null,
             },
-            type:"routes",
+            type:"services",
             type_items:[
-                "routes",
-                "plugins"
+                "services",
+                "routes"
+            ],
+            name_items:[
+                "oauth2"
+            ],
+            protocols_items:[
+                "grpc",
+                "grpcs",
+                "http",
+                "https"
             ],
             headers: [
                 {
@@ -242,43 +231,45 @@ module.exports={
                 var params={
                     id:this.item.id
                 }
-                Utils.apiCall("get", "/kong/services",params)
+                Utils.apiCall("get", "/kong/plugins",params)
                 .then(function (response) {
+                    console.log(response)
                     self.form.id=response.data.id
                     self.form.name=response.data.name
-                    self.form.protocol=response.data.protocol
-                    self.form.host=response.data.host
-                    self.form.port=response.data.port
-                    self.form.path=response.data.path
+                    self.form.protocols=response.data.protocols
+                    self.form.enabled=response.data.enabled
+                    // self.form.port=response.data.port
+                    // self.form.path=response.data.path
                 });
             }
         },
-        // getRoutes:function(){
-        //     var self=this
-        //     Utils.apiCall("get", "/kong/routes")
-        //     .then(function (response) {
-        //         var tmp=[]
-        //         for(var i=0;i<response.data.data.length;i++){
-        //             if(response.data.data[i].paths!=null){
-        //                 response.data.data[i].paths=response.data.data[i].paths.join(";")
-        //             }
-        //             if(response.data.data[i].methods!=null){
-        //                 response.data.data[i].methods=response.data.data[i].methods.join(";")
-        //             }
-        //             if(response.data.data[i].service.id==self.item.id){
-        //                 tmp.push(response.data.data[i])
-        //             }
-        //         }
-        //         self.routes=tmp
-        //     });
-        // }
+        getRoutes:function(){
+            var self=this
+            Utils.apiCall("get", "/kong/routes")
+            .then(function (response) {
+                var tmp=[]
+                for(var i=0;i<response.data.data.length;i++){
+                    if(response.data.data[i].paths!=null){
+                        response.data.data[i].paths=response.data.data[i].paths.join(";")
+                    }
+                    if(response.data.data[i].methods!=null){
+                        response.data.data[i].methods=response.data.data[i].methods.join(";")
+                    }
+                    if(response.data.data[i].service.id==self.item.id){
+                        tmp.push(response.data.data[i])
+                    }
+                }
+                self.routes=tmp
+            });
+        }
     },
     created:function() {
-        // this.loadData()
+        console.log(this.item)
+        this.loadData()
     },
     components:{
-        'routes-table': httpVueLoader('./../tables/routesTable.vue' + '?v=' + new Date().getTime()),
-        'plugins-table': httpVueLoader('./../tables/pluginsTable.vue' + '?v=' + new Date().getTime())
+        'services-table': httpVueLoader('./../tables/servicesTable.vue' + '?v=' + new Date().getTime()),
+        'routes-table': httpVueLoader('./../tables/routesTable.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

@@ -19,7 +19,7 @@
                         <v-btn
                             v-if="head.custom.type=='btn'"
                             icon
-                            @click="openServiceModal()"
+                            @click="sendEvent()"
                         >
                         <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -38,7 +38,7 @@
                         </v-btn>
                         <v-btn
                             icon
-                            @click="openServiceModal(index)"
+                            @click="sendEvent(index)"
                         >
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn>
@@ -104,9 +104,13 @@ module.exports = {
             ],
         }
     },
+    props:['item'],
     methods: {
-        openServiceModal:function(index){
-            this.$emit("open-service-modal",index==undefined ? null : this.services[index].id)
+        // openServiceModal:function(index){
+        //     this.$emit("open-service-modal",index==undefined ? null : this.services[index].id
+        // },
+        sendEvent:function(index){
+            this.$emit('event',index!=undefined ? this.services[index].id : null)
         },
         deleteRow:function(index){
             var self=this
@@ -132,11 +136,22 @@ module.exports = {
 
             Utils.apiCall("get", "/kong/services")
             .then(function (response) {
-                self.services=response.data.data
+                var tmp=[]
+                for(var i=0;i<response.data.data.length;i++){
+                    if(self.item.parent_id==null){
+                        tmp.push(response.data.data[i])
+                    }else{
+                        if(response.data.data[i].id==self.item.parent_id){
+                            tmp.push(response.data.data[i])
+                        }
+                    }
+                }
+                self.services=tmp
             });
         },
     },
     created:function() {
+        console.log(this.item)
         this.getServices()
     },
 }

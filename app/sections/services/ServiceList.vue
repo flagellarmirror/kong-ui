@@ -24,7 +24,8 @@
 
         <services-table
             ref="services"
-            @open-service-modal="openServiceModal($event)"
+            :item="{}"
+            @event="openServiceModal($event)"
         ></services-table>
 
     </div>
@@ -113,15 +114,24 @@ module.exports={
             this.select=data
             this.pluginModal=true
         },
-        closePluginModal:function(){
+        closePluginModal:function(event){
             this.pluginModal=false
             this.select=null
+            if(event.event==undefined){ //Close modal
+                if(event.refresh) this.$refs.services.getServices()
+            }else if(event.event=='editRoute'){
+                this.openRouteModal(event.data)
+            }
+            else if(event.event=='editService'){
+                this.openServiceModal(event.data.id)
+            }
         },
         openRouteModal:function(data){
             this.select=data
             this.routeModal=true
         },
         closeRouteModal:function(event){
+            console.log("provaaa")
             this.routeModal=false
             this.select=null
             if(event.event==undefined){ //Close modal
@@ -129,6 +139,8 @@ module.exports={
             }else if(event.event=='editRoute'){
                 // this.select=event.id
                 // this.openRouteModal(event.id)
+            }else if(event.event=='editService'){
+                this.openServiceModal(event.data.id)
             }
         }
     },

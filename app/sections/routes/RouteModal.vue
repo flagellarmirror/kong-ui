@@ -98,7 +98,20 @@
                 ></v-select>
                 </v-card-title>
 
-                <v-data-table
+                <!-- Components -->
+                <services-table
+                    v-if="type=='services'"
+                    :item="item"
+                    @event="closeModal(false,'editService',$event)"
+                ></services-table>
+
+                <plugins-table
+                    v-if="type=='plugins'"
+                    :item="item"
+                    @event="closeModal(false,'editPlugin',$event)"
+                ></plugins-table>
+
+                <!-- <v-data-table
                     :headers="headers"
                     :items="services"
                     :items-per-page="5"
@@ -143,7 +156,7 @@
                             </template>
                         </tr>
                     </template>
-                </v-data-table>
+                </v-data-table> -->
             </v-card>
 
             <v-card-actions>
@@ -251,11 +264,14 @@ module.exports={
         },
     },
     methods: {
-        closeModal:function(value,index,event){
+        closeModal:function(value,event,id){
             var tmp={
                 event:event,
                 refresh:value,
-                id:index!=undefined ? this.routes[index].id : null
+                data:{
+                    parent_id:this.form.id,
+                    id:id!=undefined ? id : null
+                }
             }
             this.$emit('close-modal',tmp)
         },
@@ -361,5 +377,9 @@ module.exports={
     created:function() {
         this.loadData()
     },
+    components:{
+        'services-table': httpVueLoader('./../tables/servicesTable.vue' + '?v=' + new Date().getTime()),
+        'plugins-table': httpVueLoader('./../tables/pluginsTable.vue' + '?v=' + new Date().getTime())
+    }
 }
 </script>
