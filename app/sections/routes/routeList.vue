@@ -88,12 +88,7 @@ module.exports={
         closeRouteModal:function(event){
             this.routeModal=false
             this.select=null
-            if(event.event==undefined){ //Close modal
-                if(event.refresh) this.$refs.routes.getRoutes()
-            }
-            // else if(event.event=='editRoute'){
-            //     this.openRouteModal(event.data)
-            // }
+            if(event) this.$refs.routes.getRoutes()
         },
     },
     created:function() {

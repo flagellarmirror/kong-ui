@@ -35,9 +35,11 @@
             </v-toolbar>
 
             <!-- TABS -->
-            <route-component :service_id="item" v-show="tab==0"></route-component>
+            <route-component @close-modal="closeModal($event)" :service_id="item" v-show="tab==0"></route-component>
 
-            <service-component :service_id="service" v-show="tab==1"></service-component>
+            <service-component @close-modal="closeModal($event)" :service_id="service" v-show="tab==1"></service-component>
+
+            <plugin-component :service_id="null" v-show="tab==2"></plugin-component>
 
         </v-card>
     </v-dialog>
@@ -70,61 +72,6 @@ module.exports={
         closeModal:function(refresh){
             this.$emit('close-modal',refresh)
         },
-        // submit:function(){
-        //     var self=this
-
-        //     var tmp_hosts=[]
-        //     var tmp_paths=[]
-        //     if(this.form.hosts!=null){
-        //         if(this.form.hosts.includes(";")){
-        //             var tmp= this.form.hosts.split(";")
-        //             for(var i=0;i<tmp.length;i++){
-        //                 if(tmp[i]!='') tmp_hosts.push(tmp[i])
-        //             }
-        //         }else{
-        //             if(this.form.hosts!=''){
-        //                 tmp_hosts.push(this.form.hosts)
-        //             }
-        //         }
-        //     }
-
-        //     if(this.form.paths!=null){
-        //         if(this.form.paths.includes(";")){
-        //             var tmp=this.form.paths.split(";")
-        //             for(var i=0;i<tmp.length;i++){
-        //                 if(tmp[i]!='') tmp_paths.push(tmp[i])
-        //             }
-        //         }else{
-        //             if(this.form.paths!=''){
-        //                 tmp_paths.push(this.form.paths)
-        //             }
-        //         }
-        //     }
-
-
-        //     var params={
-        //         id: this.form.id,
-        //         name: this.form.name,
-        //         protocols: this.form.protocols,
-        //         hosts: tmp_hosts,
-        //         methods: this.form.methods,
-        //         paths: tmp_paths,
-        //         service: self.item.parent_id
-        //     }
-
-        //     Utils.apiCall("post", "/kong/routes",params)
-        //     .then(function (response) {
-        //         if(response!=undefined){
-        //             Swal.fire({
-        //                 type: 'success',
-        //                 title: self.item.id==null ? 'New route create' : 'Route updated',
-        //                 text: self.item.id==null ? 'New route create' : 'Route updated',
-        //             }).then(function(result) {
-        //                 self.closeModal(true)
-        //             })
-        //         }
-        //     });
-        // },
         // loadData:function(){
         //     var self = this
 
@@ -217,7 +164,8 @@ module.exports={
     },
     components:{
         'route-component': httpVueLoader('./routeComponent.vue' + '?v=' + new Date().getTime()),
-        'service-component': httpVueLoader('./../services/serviceComponent.vue' + '?v=' + new Date().getTime())
+        'service-component': httpVueLoader('./../services/serviceComponent.vue' + '?v=' + new Date().getTime()),
+        'plugin-component': httpVueLoader('./../plugins/pluginComponent.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

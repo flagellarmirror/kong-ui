@@ -116,6 +116,61 @@ module.exports = {
         }
     },
     methods: {
+        submit:function(){
+            var self=this
+
+            var tmp_hosts=[]
+            var tmp_paths=[]
+            if(this.form.hosts!=null){
+                if(this.form.hosts.includes(";")){
+                    var tmp= this.form.hosts.split(";")
+                    for(var i=0;i<tmp.length;i++){
+                        if(tmp[i]!='') tmp_hosts.push(tmp[i])
+                    }
+                }else{
+                    if(this.form.hosts!=''){
+                        tmp_hosts.push(this.form.hosts)
+                    }
+                }
+            }
+
+            if(this.form.paths!=null){
+                if(this.form.paths.includes(";")){
+                    var tmp=this.form.paths.split(";")
+                    for(var i=0;i<tmp.length;i++){
+                        if(tmp[i]!='') tmp_paths.push(tmp[i])
+                    }
+                }else{
+                    if(this.form.paths!=''){
+                        tmp_paths.push(this.form.paths)
+                    }
+                }
+            }
+
+
+            var params={
+                id: this.form.id,
+                name: this.form.name,
+                protocols: this.form.protocols,
+                hosts: tmp_hosts,
+                methods: this.form.methods,
+                paths: tmp_paths,
+                service: this.service_id
+            }
+
+            Utils.apiCall("post", "/kong/routes",params)
+            .then(function (response) {
+                if(response!=undefined){
+                    Swal.fire({
+                        type: 'success',
+                        title: self.service_id==null ? 'New route create' : 'Route updated',
+                        text: self.service_id==null ? 'New route create' : 'Route updated',
+                    }).then(function(result) {
+                        self.$emit('close-modal',true)
+                    })
+                }
+            });
+        },
         loadData:function(){
             var self = this
             if(self.service_id!=null){
