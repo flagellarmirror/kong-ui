@@ -118,10 +118,10 @@ module.exports = {
                 if(response!=undefined){
                     Swal.fire({
                         type: 'success',
-                        title: self.item==null ? 'New service create' : 'Service updated',
-                        text: self.item==null ? 'New service create' : 'Service updated',
+                        title: self.service_id==null ? 'New service create' : 'Service updated',
+                        text: self.service_id==null ? 'New service create' : 'Service updated',
                     }).then(function(result) {
-                        self.closeModal(true)
+                        self.$emit('close-modal',true)
                     })
                 }
             });

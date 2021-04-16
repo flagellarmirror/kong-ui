@@ -33,7 +33,7 @@
 
             "action":{
                 "path": "/routes",
-                "component": "../../app/sections/routes/RouteList.vue"
+                "component": "../../app/sections/routes/routeList.vue"
             },
 
             "layout":{

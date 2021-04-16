@@ -82,9 +82,7 @@ module.exports={
     },
     methods: {
         openRouteModal:function(id){
-            this.select={
-                id:id
-            }
+            this.select=id
             this.routeModal=true
         },
         closeRouteModal:function(event){
@@ -101,8 +99,8 @@ module.exports={
     created:function() {
     },
     components:{
-        'route-modal': httpVueLoader('./RouteModal.vue' + '?v=' + new Date().getTime()),
-        'routes-table': httpVueLoader('./../tables/routesTable.vue' + '?v=' + new Date().getTime())
+        'route-modal': httpVueLoader('./routeModal.vue' + '?v=' + new Date().getTime()),
+        'routes-table': httpVueLoader('./routesTable.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

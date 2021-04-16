@@ -67,6 +67,7 @@ $app->group('/kong/services', function (RouteCollectorProxy $group) {
         $params = $utils->getParams($request);
 
         // if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
+        die($params['id']);
 
         $url = empty($params['id']) ? $getKongConfig()."/routes/" : $getKongConfig()."/routes/".$params['id'];
         $resp = $utils->apicall($url,"get");

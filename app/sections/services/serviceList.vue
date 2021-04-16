@@ -41,7 +41,7 @@ module.exports={
         closeServiceModal:function(event){
             this.serviceModal=false
             this.select=null
-            if(event.refresh) this.$refs.services.getServices()
+            if(event) this.$refs.services.getServices()
         },
     },
     created:function() {
@@ -49,7 +49,7 @@ module.exports={
     },
     components:{
         'services-table': httpVueLoader('./servicesTable.vue' + '?v=' + new Date().getTime()),
-        'service-modal': httpVueLoader('./ServiceModal.vue' + '?v=' + new Date().getTime())
+        'service-modal': httpVueLoader('./serviceModal.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

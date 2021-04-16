@@ -116,42 +116,8 @@ module.exports = {
         }
     },
     methods: {
-        // loadData:function(){
-        //     var self=this
-        //     Utils.apiCall("get", "/kong/routes")
-        //     .then(function (response) {
-        //         var tmp=[]
-        //         console.log(response)
-        //         for(var i=0;i<response.data.data.length;i++){
-        //             if(response.data.data[i].service.id==self.service_id){
-        //                 self.form.id=response.data.data[i].id
-        //                 self.form.name=response.data.data[i].name
-        //                 if(response.data.data[i].methods!=null) self.form.methods=response.data.data[i].methods
-        //                 if(response.data.data[i].hosts!=null) {
-        //                     if(response.data.data[i].hosts.length==1){
-        //                         self.form.hosts=response.data.data[i].hosts.toString()
-        //                     }else{
-        //                         self.form.hosts=response.data.data[i].hosts.join(";")
-        //                     }
-        //                 }
-        //                 if(response.data.data[i].protocols!=null) self.form.protocols=response.data.data[i].protocols
-        //                 if(response.data.data[i].paths!=null) {
-        //                     if(response.data.data[i].paths.length==1){
-        //                         self.form.paths=response.data.data[i].paths.toString()
-        //                     }else{
-        //                         self.form.paths=response.data.data[i].paths.join(";")
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //         self.routes=tmp
-        //         console.log(self.routes)
-        //     });
-        // }
         loadData:function(){
             var self = this
-
-
             if(self.service_id!=null){
                 var params={
                     id:self.service_id
@@ -183,7 +149,6 @@ module.exports = {
     },
     created:function() {
         this.loadData()
-        console.log(this.service_id)
     },
 }
 </script>

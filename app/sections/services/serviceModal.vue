@@ -35,7 +35,7 @@
             </v-toolbar>
 
             <!-- TABS -->
-            <service-component :service_id="item" v-show="tab==0"></service-component>
+            <service-component @close-modal="closeModal($event)" :service_id="item" v-show="tab==0"></service-component>
 
             <template v-if="tab==1">
                 <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
