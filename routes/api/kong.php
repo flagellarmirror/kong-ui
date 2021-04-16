@@ -60,20 +60,6 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
                         ->withHeader("Content-Type", "application/json");
     });
 
-    $group->delete('/services', function (Request $request, Response $response, array $args) use($getKongConfig) {
-        $utils = new Utils();
-        $params = $utils->getParams($request);
-
-        if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
-
-        $url = $getKongConfig()."/services/".$params['id'];
-        $resp = $utils->apicall($url,'delete');
-
-        $response->getBody()->write($resp);
-        return $response->withStatus(200)
-                        ->withHeader("Content-Type", "application/json");
-    });
-
     $group->get('/routes', function (Request $request, Response $response, array $args) use($getKongConfig) {
         $utils = new Utils();
         $params = $utils->getParams($request);
@@ -140,6 +126,35 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
 
         $url = empty($params['id']) ? $getKongConfig()."/plugins/" : $getKongConfig()."/plugins/".$params['id'];
         $resp = $utils->apicall($url,"get");
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->post('/plugins', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) unset($params['id']);
+        if(empty($params['name'])) unset($params['name']);
+        if(empty($params['token_expiration'])){
+            unset($params['token_expiration']);
+        }else{
+            $params['token_expiration']= (int)$params['token_expiration'];
+            if($params['token_expiration']==0) unset($params['token_expiration']);
+        }
+        if(empty($params['protocols'])) unset($params['protocols']);
+        if(empty($params['provision_key'])) unset($params['provision_key']);
+        if(empty($params['scopes'])) unset($params['scopes']);
+
+        $update=false;
+        if(!empty($params['id'])) $update=true;
+        if(!$update&&empty($params['host'])) throw new Exception("Parameter 'host' not found");
+
+        $url = $update ? $getKongConfig()."/plugins/".$params['id'] : $getKongConfig()."/plugins/";
+        $method = $update ? 'patch' : 'post';
+        $resp = $utils->apicall($url,$method,$params);
 
         $response->getBody()->write($resp);
         return $response->withStatus(200)

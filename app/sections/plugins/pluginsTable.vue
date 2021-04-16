@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="services"
+        :items="routes"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -19,7 +19,7 @@
                         <v-btn
                             v-if="head.custom.type=='btn'"
                             icon
-                            @click="sendEvent()"
+                            @click="$emit('event',null)"
                         >
                         <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -31,9 +31,7 @@
             <tr>
                 <template v-for="(header,i) in headers">
                     <td :key="i" v-if="i==0" style="text-align:center">
-                        <v-btn icon
-                            @click="deleteRow(index)"
-                        >
+                        <v-btn icon>
                             <v-icon>mdi-delete</v-icon>
                         </v-btn>
                         <v-btn
@@ -52,9 +50,9 @@
 
 <script>
 module.exports = {
-    data:function() {
-        return {
-            services:[],
+    data:function(){
+        return{
+            routes:[],
             headers: [
                 {
                     text: 'Actions',
@@ -66,7 +64,7 @@ module.exports = {
                     }
                 },
                 {
-                    text: 'Service ID',
+                    text: 'Plugin ID',
                     align: 'start',
                     value: 'id',
                     custom:{
@@ -81,78 +79,45 @@ module.exports = {
                     }
                 },
                 {
-                    text: 'Host',
-                    value: 'host',
+                    text: 'Enabled',
+                    value: 'enabled',
                     custom:{
                         type:"text"
                     }
                 },
                 {
-                    text: 'Path',
-                    value: 'path',
+                    text: 'Protocols',
+                    value: 'protocols',
                     custom:{
                         type:"text"
                     }
-                },
-                {
-                    text: 'Protocol',
-                    value: 'protocol',
-                    custom:{
-                        type:"text"
-                    }
-                },
+                }
             ],
         }
     },
     props:['item'],
     methods: {
-        // openServiceModal:function(index){
-        //     this.$emit("open-service-modal",index==undefined ? null : this.services[index].id
-        // },
         sendEvent:function(index){
-            this.$emit('event',index!=undefined ? this.services[index].id : null)
+            this.$emit('event',this.routes[index].id)
         },
-        deleteRow:function(index){
+        getPlugins:function(){
             var self=this
-
-            var params={
-                id: this.services[index].id
-            }
-            Utils.apiCall("delete", "/kong/services",params)
+            Utils.apiCall("get", "/kong/plugins")
             .then(function (response) {
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Service delete',
-                        text: 'Service delete',
-                    }).then(function(result) {
-                        self.getServices()
-                    })
-                }
-            });
-        },
-        getServices:function(){
-            var self=this
-
-            Utils.apiCall("get", "/kong/services")
-            .then(function (response) {
+                console.log(response)
                 var tmp=[]
                 for(var i=0;i<response.data.data.length;i++){
-                    if(self.item.parent_id==null){
-                        tmp.push(response.data.data[i])
-                    }else{
-                        if(response.data.data[i].id==self.item.parent_id){
-                            tmp.push(response.data.data[i])
-                        }
+                    if(response.data.data[i].protocols!=null){
+                        response.data.data[i].protocols=response.data.data[i].protocols.join(";")
                     }
+                    tmp.push(response.data.data[i])
                 }
-                self.services=tmp
+                self.routes=tmp
             });
-        },
+        }
     },
     created:function() {
-        console.log(this.item)
-        this.getServices()
+        this.getPlugins();
     },
 }
 </script>

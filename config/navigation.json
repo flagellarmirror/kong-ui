@@ -15,7 +15,7 @@
 
             "action":{
                 "path": "/services",
-                "component": "../../app/sections/services/ServiceList.vue"
+                "component": "../../app/sections/services/serviceList.vue"
             },
 
             "layout":{
@@ -33,7 +33,25 @@
 
             "action":{
                 "path": "/routes",
-                "component": "../../app/sections/routes/RouteList.vue"
+                "component": "../../app/sections/routes/routeList.vue"
+            },
+
+            "layout":{
+                "icon":"mdi-view-dashboard-variant",
+                "disabled": false,
+                "color": false,
+                "class": false
+            }
+        },
+        {
+            "title": "Plugins",
+            "subtitle": "Kong plugins",
+            "allowed":[],
+            "visible": true,
+
+            "action":{
+                "path": "/plugins",
+                "component": "../../app/sections/plugins/pluginList.vue"
             },
 
             "layout":{

@@ -126,7 +126,6 @@ module.exports = {
         },
         deleteRow:function(index){
             var self=this
-
             var params={
                 id: this.routes[index].id
             }
