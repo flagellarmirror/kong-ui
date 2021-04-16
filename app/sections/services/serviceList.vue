@@ -1,7 +1,6 @@
 <template>
     <div>
 
-        <!-- Service modal -->
         <service-modal
             v-if="serviceModal"
             @close-modal="closeServiceModal($event)"
@@ -23,17 +22,9 @@ module.exports={
         return{
             serviceModal: false,
             select:null,
-            services:[],
         }
     },
     methods: {
-        getServices:function(){
-            var self=this
-            Utils.apiCall("get", "/kong/services")
-            .then(function (response) {
-                self.services=response.data.data
-            });
-        },
         openServiceModal:function(service_id){
             this.select=service_id
             this.serviceModal=true
@@ -45,7 +36,6 @@ module.exports={
         },
     },
     created:function() {
-        this.getServices()
     },
     components:{
         'services-table': httpVueLoader('./servicesTable.vue' + '?v=' + new Date().getTime()),

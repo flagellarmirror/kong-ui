@@ -3,6 +3,8 @@
         <v-card>
             <v-toolbar
                 dense
+                dark
+                color="blue"
             >
                 <v-toolbar-title>
                     {{modalTitle}}
@@ -14,95 +16,31 @@
                 >
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
+
+                <template v-slot:extension>
+                    <v-tabs
+                        v-model="tab"
+                        dark
+                        fixed-tabs
+                    >
+                        <v-tab
+                            v-for="item in tabs"
+                            :key="item"
+                        >
+                            {{ item }}
+                        </v-tab>
+                    </v-tabs>
+                </template>
+
             </v-toolbar>
 
-            <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
-                <v-flex xs3 pr-2 pb-3>
-                    <v-text-field
-                        outlined
-                        dense
-                        hide-details
-                        readonly
-                        label="Plugin id"
-                        v-model="form.id"
-                    ></v-text-field>
-                </v-flex>
-                <v-flex xs3 pl-2 pr-2 pb-3>
-                    <!-- <v-text-field
-                        outlined
-                        dense
-                        hide-details
-                        label="Name"
-                        v-model="form.name"
-                    ></v-text-field> -->
-                    <v-select
-                        outlined
-                        dense
-                        hide-details
-                        label="Name"
-                        :items="name_items"
-                        v-model="form.name"
-                    ></v-select>
-                </v-flex>
-                <v-flex xs3 pl-2 pr-2 pb-3>
-                    <v-select
-                        outlined
-                        dense
-                        hide-details
-                        label="Protocols"
-                        multiple
-                        :items="protocols_items"
-                        v-model="form.protocols"
-                    ></v-select>
-                </v-flex>
-                <v-flex xs3 pb-3>
-                    <v-select
-                        outlined
-                        dense
-                        hide-details
-                        label="Enabled"
-                        :items="[true,false]"
-                        v-model="form.enabled"
-                    ></v-select>
-                </v-flex>
-            </v-layout>
+            <!-- TABS -->
+            <plugin-component @close-modal="closeModal($event)" :plugin_id="item" v-show="tab==0"></plugin-component>
 
-            <v-card class="ma-2" v-if="item.id!=null">
-                <v-card-title class="pl-2 pr-0 pb-0 pt-0">
-                    Link
-                    <v-spacer></v-spacer>
+            <route-component @close-modal="closeModal($event)" :route_id="route" v-show="tab==1"></route-component>
 
-                <v-select
-                    dense
-                    hide-details
-                    :items="type_items"
-                    v-model="type"
-                ></v-select>
-                </v-card-title>
+            <service-component @close-modal="closeModal($event)" :service_id="service" v-show="tab==2"></service-component>
 
-                <!-- Components -->
-                <services-table
-                    v-if="type=='services'"
-                    :item="item"
-                    @event="closeModal(false,'editService',$event)"
-                ></services-table>
-
-                <routes-table
-                    v-if="type=='routes'"
-                    :item="item"
-                    @event="closeModal(false,'editRoute',$event)"
-                ></routes-table>
-
-            </v-card>
-
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                    @click="submit()"
-                >
-                    Salva
-                </v-btn>
-            </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
@@ -111,84 +49,20 @@
 module.exports={
     data:function() {
         return{
-            routes:[],
-            form:{
-                id:null,
-                name:null,
-                protocols:null,
-                enabled:null,
-                host:null,
-                port:null,
-                path:null,
-            },
-            type:"services",
-            type_items:[
-                "services",
-                "routes"
+            plugin:null,
+            service:null,
+            route:null,
+            tabs:[
+                'plugin', 'route', 'service',
             ],
-            name_items:[
-                "oauth2"
-            ],
-            protocols_items:[
-                "grpc",
-                "grpcs",
-                "http",
-                "https"
-            ],
-            headers: [
-                {
-                    text: 'Actions',
-                    value: null,
-                    align: 'center',
-                    sortable: false,
-                    custom:{
-                        type:"btn"
-                    }
-                },
-                {
-                    text: 'Route ID',
-                    align: 'start',
-                    value: 'id',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Name',
-                    value: 'name',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Hosts',
-                    value: 'hosts',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Paths',
-                    value: 'paths',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Methods',
-                    value: 'methods',
-                    custom:{
-                        type:"text"
-                    }
-                },
-            ],
+            tab: null,
         }
     },
     props:['item'],
     computed:{
         modalTitle(){
-            if(this.item.id!=null){
-                return 'Modify plugin: '+this.item.id
+            if(this.item!=null){
+                return 'Modify plugin: '+this.item
             }else{
                 return "Create plugin"
             }
@@ -196,80 +70,59 @@ module.exports={
         },
     },
     methods: {
-        closeModal:function(value,event,id){
-            var tmp={
-                event:event,
-                refresh:value,
-                data:{
-                    parent_id:this.form.id,
-                    id:id!=undefined ? id : null
-                }
-            }
-            this.$emit('close-modal',tmp)
-        },
-        submit:function(){
-            var self=this
-            // this.form.port = parseInt(this.form.port)
-            Utils.apiCall("post", "/kong/services",this.form)
-            .then(function (response) {
-                // PROBLEMA APICALL LA CHIAMATA FALLISCHE MA IL CODICE VIENE ESEGUITO
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: self.item==null ? 'New service create' : 'Service updated',
-                        text: self.item==null ? 'New service create' : 'Service updated',
-                    }).then(function(result) {
-                        self.closeModal(true)
-                    })
-                }
-            });
+        closeModal:function(refresh){
+            this.$emit('close-modal',refresh)
         },
         loadData:function(){
-            var self=this
-
-            if(this.item.id!=null){
-                var params={
-                    id:this.item.id
-                }
-                Utils.apiCall("get", "/kong/plugins",params)
-                .then(function (response) {
-                    console.log(response)
-                    self.form.id=response.data.id
-                    self.form.name=response.data.name
-                    self.form.protocols=response.data.protocols
-                    self.form.enabled=response.data.enabled
-                    // self.form.port=response.data.port
-                    // self.form.path=response.data.path
-                });
+            if(this.item!=null){
+                this.getPlugin()
             }
         },
-        getRoutes:function(){
+        getPlugin:function(){
             var self=this
-            Utils.apiCall("get", "/kong/routes")
+            var params={
+                id: self.item
+            }
+            Utils.apiCall("get", "/kong/plugins",params)
             .then(function (response) {
-                var tmp=[]
-                for(var i=0;i<response.data.data.length;i++){
-                    if(response.data.data[i].paths!=null){
-                        response.data.data[i].paths=response.data.data[i].paths.join(";")
-                    }
-                    if(response.data.data[i].methods!=null){
-                        response.data.data[i].methods=response.data.data[i].methods.join(";")
-                    }
-                    if(response.data.data[i].service.id==self.item.id){
-                        tmp.push(response.data.data[i])
+                console.log(response)
+                self.plugin=response.data.data
+                if(response.data.service!=null){
+                    self.service=response.data.service.id
+                }else{
+                    for(var i=0;i<self.tabs.length;i++){
+                        if(self.tabs[i]=='service'){
+                            self.tabs.splice(i,1)
+                        }
                     }
                 }
-                self.routes=tmp
-            });
-        }
+                if(response.data.route!=null){
+                    self.route=response.data.route.id
+                }else{
+                    for(var i=0;i<self.tabs.length;i++){
+                        if(self.tabs[i]=='route'){
+                            self.tabs.splice(i,1)
+                        }
+                    }
+                }
+            }).catch(function(){
+                for(var i=0;i<self.tabs.length;i++){
+                    if(self.tabs[i]=='service'){
+                        self.tabs.splice(i,1)
+                    }
+                    if(self.tabs[i]=='route'){
+                        self.tabs.splice(i,1)
+                    }
+                }
+            })
+        },
     },
     created:function() {
-        console.log(this.item)
         this.loadData()
     },
     components:{
-        'services-table': httpVueLoader('./../tables/servicesTable.vue' + '?v=' + new Date().getTime()),
-        'routes-table': httpVueLoader('./../tables/routesTable.vue' + '?v=' + new Date().getTime())
+        'plugin-component': httpVueLoader('./pluginComponent.vue' + '?v=' + new Date().getTime()),
+        'route-component': httpVueLoader('./../routes/routeComponent.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

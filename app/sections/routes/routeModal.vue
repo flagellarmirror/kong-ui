@@ -35,11 +35,27 @@
             </v-toolbar>
 
             <!-- TABS -->
-            <route-component @close-modal="closeModal($event)" :service_id="item" v-show="tab==0"></route-component>
+            <route-component @close-modal="closeModal($event)" :route_id="item" v-show="tab==0"></route-component>
 
             <service-component @close-modal="closeModal($event)" :service_id="service" v-show="tab==1"></service-component>
 
-            <plugin-component :service_id="null" v-show="tab==2"></plugin-component>
+            <template v-if="tab==2">
+                <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
+                    <v-flex xs12>
+                        <v-select
+                            outlined
+                            dense
+                            hide-details
+                            label="Select plugin"
+                            :items="plugins"
+                            item-text="custom"
+                            item-value="id"
+                            v-model="plugin"
+                        ></v-select>
+                    </v-flex>
+                </v-layout>
+                <plugin-component @close-modal="closeModal($event)" :plugin_id="plugin" v-show="tab==2"></plugin-component>
+            </template>
 
         </v-card>
     </v-dialog>
@@ -50,6 +66,7 @@ module.exports={
     data:function() {
         return{
             plugins:[],
+            plugin:null,
             tabs:[
                 'route', 'service', 'plugins'
             ],
@@ -72,43 +89,10 @@ module.exports={
         closeModal:function(refresh){
             this.$emit('close-modal',refresh)
         },
-        // loadData:function(){
-        //     var self = this
-
-
-        //     if(this.item.id!=null){
-        //         var params={
-        //             id:this.item.id
-        //         }
-        //         Utils.apiCall("get", "/kong/routes",params)
-        //         .then(function (response) {
-        //             console.log(response)
-        //             self.form.id=response.data.id
-        //             self.form.name=response.data.name
-        //             if(response.data.methods!=null) self.form.methods=response.data.methods
-        //             if(response.data.hosts!=null) {
-        //                 if(response.data.hosts.length==1){
-        //                     self.form.hosts=response.data.hosts.toString()
-        //                 }else{
-        //                     self.form.hosts=response.data.hosts.join(";")
-        //                 }
-        //             }
-        //             if(response.data.protocols!=null) self.form.protocols=response.data.protocols
-        //             if(response.data.paths!=null) {
-        //                 if(response.data.paths.length==1){
-        //                     self.form.paths=response.data.paths.toString()
-        //                 }else{
-        //                     self.form.paths=response.data.paths.join(";")
-        //                 }
-        //             }
-        //             if(response.data.service!=null) self.getServices(response.data.service.id)
-        //         });
-        //     }
-        // },
         loadData:function(){
             if(this.item!=null){
                 this.getRoute()
-                // this.getPlugins()
+                this.getPlugins()
             }
         },
         getRoute:function(){
@@ -142,7 +126,7 @@ module.exports={
                 var tmp=[]
                 for(var i=0;i<response.data.data.length;i++){
                     response.data.data[i].custom=response.data.data[i].name + " ["+response.data.data[i].id+ "]"
-                    if(response.data.data[i].service!=null&&response.data.data[i].service.id==self.item){
+                    if(response.data.data[i].route!=null&&response.data.data[i].route.id==self.item){
                         tmp.push(response.data.data[i])
                     }
                 }
@@ -154,12 +138,10 @@ module.exports={
                     }
                 }
                 self.plugins=tmp
-                //TODO: Add plugin component
             });
         },
     },
     created:function() {
-        console.log(this.item)
         this.loadData()
     },
     components:{

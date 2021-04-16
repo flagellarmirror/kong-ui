@@ -87,7 +87,6 @@ module.exports = {
     props:["service_id"],
     watch:{
         service_id:function(){
-            console.log("cambio")
             this.loadData()
         }
     },
@@ -111,7 +110,6 @@ module.exports = {
         },
         submit:function(){
             var self=this
-            // this.form.port = parseInt(this.form.port)
             Utils.apiCall("post", "/kong/services",this.form)
             .then(function (response) {
                 // PROBLEMA APICALL LA CHIAMATA FALLISCHE MA IL CODICE VIENE ESEGUITO

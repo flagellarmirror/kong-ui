@@ -42,6 +42,24 @@
                 "color": false,
                 "class": false
             }
+        },
+        {
+            "title": "Plugins",
+            "subtitle": "Kong plugins",
+            "allowed":[],
+            "visible": true,
+
+            "action":{
+                "path": "/plugins",
+                "component": "../../app/sections/plugins/pluginList.vue"
+            },
+
+            "layout":{
+                "icon":"mdi-view-dashboard-variant",
+                "disabled": false,
+                "color": false,
+                "class": false
+            }
         }
     ]
 }

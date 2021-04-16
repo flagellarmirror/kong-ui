@@ -1,7 +1,6 @@
 <template>
     <div>
 
-        <!-- Route modal -->
         <route-modal
             v-if="routeModal"
             @close-modal="closeRouteModal($event)"
@@ -23,61 +22,6 @@ module.exports={
         return{
             routeModal: false,
             select:null,
-            routes:[],
-            headers: [
-                {
-                    text: 'Actions',
-                    value: null,
-                    align: 'center',
-                    sortable: false,
-                    custom:{
-                        type:"btn"
-                    }
-                },
-                {
-                    text: 'Route ID',
-                    align: 'start',
-                    value: 'id',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Name',
-                    value: 'name',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Hosts',
-                    value: 'hosts',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Paths',
-                    value: 'paths',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Methods',
-                    value: 'methods',
-                    custom:{
-                        type:"text"
-                    }
-                },
-                {
-                    text: 'Service ID',
-                    value: 'service_id',
-                    custom:{
-                        type:"text"
-                    }
-                },
-            ],
         }
     },
     methods: {

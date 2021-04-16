@@ -108,10 +108,9 @@ module.exports = {
             ],
         }
     },
-    props:["service_id"],
+    props:["route_id"],
     watch:{
-        service_id:function(){
-            console.log("cambio")
+        route_id:function(){
             this.loadData()
         }
     },
@@ -155,7 +154,6 @@ module.exports = {
                 hosts: tmp_hosts,
                 methods: this.form.methods,
                 paths: tmp_paths,
-                service: this.service_id
             }
 
             Utils.apiCall("post", "/kong/routes",params)
@@ -163,8 +161,8 @@ module.exports = {
                 if(response!=undefined){
                     Swal.fire({
                         type: 'success',
-                        title: self.service_id==null ? 'New route create' : 'Route updated',
-                        text: self.service_id==null ? 'New route create' : 'Route updated',
+                        title: self.route_id==null ? 'New route create' : 'Route updated',
+                        text: self.route_id==null ? 'New route create' : 'Route updated',
                     }).then(function(result) {
                         self.$emit('close-modal',true)
                     })
@@ -173,9 +171,9 @@ module.exports = {
         },
         loadData:function(){
             var self = this
-            if(self.service_id!=null){
+            if(self.route_id!=null){
                 var params={
-                    id:self.service_id
+                    id:self.route_id
                 }
                 Utils.apiCall("get", "/kong/routes",params)
                 .then(function (response) {

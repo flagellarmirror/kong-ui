@@ -52,7 +52,25 @@
                         ></v-select>
                     </v-flex>
                 </v-layout>
-                <route-component :service_id="route" v-show="tab==1"></route-component>
+                <route-component :route_id="route" v-show="tab==1"></route-component>
+            </template>
+
+            <template v-if="tab==2">
+                <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
+                    <v-flex xs12>
+                        <v-select
+                            outlined
+                            dense
+                            hide-details
+                            label="Select plugin"
+                            :items="plugins"
+                            item-text="custom"
+                            item-value="id"
+                            v-model="plugin"
+                        ></v-select>
+                    </v-flex>
+                </v-layout>
+                <plugin-component @close-modal="closeModal($event)" :plugin_id="plugin" v-show="tab==2"></plugin-component>
             </template>
         </v-card>
     </v-dialog>
@@ -64,6 +82,7 @@ module.exports={
         return{
             routes:[],
             plugins:[],
+            plugin:null,
             tabs:[
                 'services', 'routes', 'plugins'
             ],
@@ -132,7 +151,6 @@ module.exports={
                     }
                 }
                 self.plugins=tmp
-                //TODO: Add plugin component
             });
         },
     },

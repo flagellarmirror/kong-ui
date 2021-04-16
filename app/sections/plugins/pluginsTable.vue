@@ -98,21 +98,19 @@ module.exports = {
     props:['item'],
     methods: {
         sendEvent:function(index){
-            console.log("invio evento")
             this.$emit('event',this.routes[index].id)
         },
         getPlugins:function(){
             var self=this
             Utils.apiCall("get", "/kong/plugins")
             .then(function (response) {
+                console.log(response)
                 var tmp=[]
                 for(var i=0;i<response.data.data.length;i++){
                     if(response.data.data[i].protocols!=null){
                         response.data.data[i].protocols=response.data.data[i].protocols.join(";")
                     }
-                    if(response.data.data[i].service.id==self.item.id){
-                        tmp.push(response.data.data[i])
-                    }
+                    tmp.push(response.data.data[i])
                 }
                 self.routes=tmp
             });
