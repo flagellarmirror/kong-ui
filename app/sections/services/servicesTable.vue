@@ -104,17 +104,13 @@ module.exports = {
             ],
         }
     },
-    props:['item'],
+    props:['service_id'],
     methods: {
-        // openServiceModal:function(index){
-        //     this.$emit("open-service-modal",index==undefined ? null : this.services[index].id
-        // },
         sendEvent:function(index){
             this.$emit('event',index!=undefined ? this.services[index].id : null)
         },
         deleteRow:function(index){
             var self=this
-
             var params={
                 id: this.services[index].id
             }
@@ -133,25 +129,13 @@ module.exports = {
         },
         getServices:function(){
             var self=this
-
             Utils.apiCall("get", "/kong/services")
             .then(function (response) {
-                var tmp=[]
-                for(var i=0;i<response.data.data.length;i++){
-                    if(self.item.parent_id==null){
-                        tmp.push(response.data.data[i])
-                    }else{
-                        if(response.data.data[i].id==self.item.parent_id){
-                            tmp.push(response.data.data[i])
-                        }
-                    }
-                }
-                self.services=tmp
+                self.services=response.data.data
             });
         },
     },
     created:function() {
-        console.log(this.item)
         this.getServices()
     },
 }

@@ -15,7 +15,7 @@
 
             "action":{
                 "path": "/services",
-                "component": "../../app/sections/services/ServiceList.vue"
+                "component": "../../app/sections/services/serviceList.vue"
             },
 
             "layout":{
