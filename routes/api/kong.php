@@ -138,19 +138,20 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
 
         if(empty($params['id'])) unset($params['id']);
         if(empty($params['name'])) unset($params['name']);
-        if(empty($params['token_expiration'])){
-            unset($params['token_expiration']);
+        if(empty($params['config']['token_expiration'])){
+            unset($params['config']['token_expiration']);
         }else{
-            $params['token_expiration']= (int)$params['token_expiration'];
-            if($params['token_expiration']==0) unset($params['token_expiration']);
+            $params['config']['token_expiration']= (int)$params['config']['token_expiration'];
+            if($params['config']['token_expiration']==0) unset($params['config']['token_expiration']);
         }
         if(empty($params['protocols'])) unset($params['protocols']);
-        if(empty($params['provision_key'])) unset($params['provision_key']);
-        if(empty($params['scopes'])) unset($params['scopes']);
+        if(empty($params['config']['provision_key'])) unset($params['config']['provision_key']);
+        if(empty($params['config']['scopes'])) unset($params['config']['scopes']);
 
         $update=false;
         if(!empty($params['id'])) $update=true;
-        if(!$update&&empty($params['host'])) throw new Exception("Parameter 'host' not found");
+        if(!$update&&empty($params['name'])) throw new Exception("Parameter 'Plugin type' not found");
+        if(!$update&&empty($params['service']['id'])&&empty($params['route']['id'])) throw new Exception("'Id service' or 'Id route' not found");
 
         $url = $update ? $getKongConfig()."/plugins/".$params['id'] : $getKongConfig()."/plugins/";
         $method = $update ? 'patch' : 'post';

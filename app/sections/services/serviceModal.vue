@@ -29,6 +29,37 @@
                         >
                             {{ item }}
                         </v-tab>
+                        <v-tab>
+                            <v-menu
+                                v-if="more.length"
+                                bottom
+                                left
+                            >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                    text
+                                    class="align-self-center mr-4"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    >
+                                    plugins
+                                    <v-icon right>
+                                        mdi-menu-down
+                                    </v-icon>
+                                    </v-btn>
+                                </template>
+
+                                <v-list class="grey lighten-3">
+                                    <v-list-item
+                                    v-for="item in more"
+                                    :key="item"
+                                    @click="selectPlugin(item)"
+                                    >
+                                    {{ item.custom }}
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                        </v-tab>
                     </v-tabs>
                 </template>
 
@@ -55,23 +86,7 @@
                 <route-component :route_id="route" v-show="tab==1"></route-component>
             </template>
 
-            <template v-if="tab==2">
-                <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
-                    <v-flex xs12>
-                        <v-select
-                            outlined
-                            dense
-                            hide-details
-                            label="Select plugin"
-                            :items="plugins"
-                            item-text="custom"
-                            item-value="id"
-                            v-model="plugin"
-                        ></v-select>
-                    </v-flex>
-                </v-layout>
-                <plugin-component @close-modal="closeModal($event)" :plugin_id="plugin" v-show="tab==2"></plugin-component>
-            </template>
+            <plugin-component @close-modal="closeModal($event)" :plugin_id="plugin" v-show="tab==2"></plugin-component>
         </v-card>
     </v-dialog>
 </template>
@@ -82,10 +97,11 @@ module.exports={
         return{
             routes:[],
             plugins:[],
-            plugin:null,
+            plugin:{plugin_id:null},
             tabs:[
-                'services', 'routes', 'plugins'
+                'service', 'routes'
             ],
+            more:[{custom:'add plugin'}],
             tab: null,
             route:null,
         }
@@ -102,6 +118,16 @@ module.exports={
         },
     },
     methods: {
+        selectPlugin:function(plugin){
+            console.log(plugin.id)
+            var tmp={
+                plugin_id: plugin.id!=undefined ? plugin.id : null,
+                origin:'service',
+                origin_id:this.item
+            }
+            this.plugin=tmp
+            this.tab=2
+        },
         closeModal:function(refresh){
             this.$emit('close-modal',refresh)
         },
@@ -137,19 +163,15 @@ module.exports={
             Utils.apiCall("get", "/kong/plugins")
             .then(function (response) {
                 var tmp=[]
+                var tmp_plugins=[{custom:'add plugin'}]
                 for(var i=0;i<response.data.data.length;i++){
                     response.data.data[i].custom=response.data.data[i].name + " ["+response.data.data[i].id+ "]"
                     if(response.data.data[i].service!=null&&response.data.data[i].service.id==self.item){
                         tmp.push(response.data.data[i])
+                        tmp_plugins.push(response.data.data[i])
                     }
                 }
-                if(tmp.length==0){
-                    for(var i=0;i<self.tabs.length;i++){
-                        if(self.tabs[i]=='plugins'){
-                            self.tabs.splice(i,1)
-                        }
-                    }
-                }
+                self.more=tmp_plugins
                 self.plugins=tmp
             });
         },
@@ -159,7 +181,8 @@ module.exports={
     },
     components:{
         'route-component': httpVueLoader('./../routes/routeComponent.vue' + '?v=' + new Date().getTime()),
-        'service-component': httpVueLoader('./serviceComponent.vue' + '?v=' + new Date().getTime())
+        'service-component': httpVueLoader('./serviceComponent.vue' + '?v=' + new Date().getTime()),
+        'plugin-component': httpVueLoader('./../plugins/pluginComponent.vue' + '?v=' + new Date().getTime()),
     }
 }
 </script>

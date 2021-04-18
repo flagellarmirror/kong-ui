@@ -12,6 +12,31 @@
                 ></v-select>
             </v-flex>
 
+            <template v-if="plugin_id.plugin_id==null&&plugin_id.origin==null">
+                <v-flex xs6 pb-3 pr-3>
+                    <v-select
+                        outlined
+                        dense
+                        hide-details
+                        :items="['service','route']"
+                        v-model="association.type"
+                        label="Association type"
+                    ></v-select>
+                </v-flex>
+                <v-flex xs6 pb-3 pl-3>
+                    <v-select
+                        outlined
+                        dense
+                        hide-details
+                        :items="association_items"
+                        item-text="custom"
+                        item-value="id"
+                        v-model="association.id"
+                        label="Association id"
+                    ></v-select>
+                </v-flex>
+            </template>
+
             <!-- Oauth2 plugin -->
             <v-flex xs4 pr-2 pb-3>
                 <v-text-field
@@ -130,6 +155,10 @@ module.exports = {
     data:function(){
         return{
             routes:[],
+            association:{
+                type:null,
+                id:null,
+            },
             form:{
                 id:null,
                 name:null,
@@ -144,12 +173,15 @@ module.exports = {
                 scopes:null,
             },
             hint_scopes:false,
+            association_items:[],
             plugins_items:[
                 "oauth2",
             ],
             protocols_items:[
                 "http",
-                "https"
+                "https",
+                "grpc",
+                "grpcs"
             ],
         }
     },
@@ -157,9 +189,36 @@ module.exports = {
     watch:{
         plugin_id:function(){
             this.loadData()
+            console.log("quiiii")
+            console.log(this.plugin_id)
+        },
+        'association.type':function(){
+            console.log("cambia")
+            if(this.association.type=='route') this.getRoutes()
+            if(this.association.type=='service') this.getServices()
         }
     },
     methods: {
+        getRoutes:function(){
+            var self=this
+            Utils.apiCall("get", "/kong/routes")
+            .then(function (response) {
+                for(var i=0;i<response.data.data.length;i++){
+                    response.data.data[i].custom=response.data.data[i].name + " ["+response.data.data[i].id+ "]"
+                }
+                self.association_items=response.data.data
+            })
+        },
+        getServices:function(){
+            var self=this
+            Utils.apiCall("get", "/kong/services")
+            .then(function (response) {
+                for(var i=0;i<response.data.data.length;i++){
+                    response.data.data[i].custom=response.data.data[i].name + " ["+response.data.data[i].id+ "]"
+                }
+                self.association_items=response.data.data
+            })
+        },
         submit:function(){
             var self=this
 
@@ -192,14 +251,31 @@ module.exports = {
                     provision_key: this.form.provision_key
                 }
             }
+            if(this.plugin_id.plugin_id==null&&this.plugin_id.origin==null){
+                if(this.association.type=='route'){
+                    params.route={}
+                    params.route.id=this.association.id
+                }else if (this.association.type=='service'){
+                    params.service={}
+                    params.service.id=this.association.id
+                }
+            }else{
+                if(this.plugin_id.origin=='route'){
+                    params.route={}
+                    params.route.id=this.plugin_id.origin_id
+                }else if (this.plugin_id.origin=='service'){
+                    params.service={}
+                    params.service.id=this.plugin_id.origin_id
+                }
+            }
 
             Utils.apiCall("post", "/kong/plugins",params)
             .then(function (response) {
                 if(response!=undefined){
                     Swal.fire({
                         type: 'success',
-                        title: self.plugin_id==null ? 'New plugin create' : 'Plugin updated',
-                        text: self.plugin_id==null ? 'New plugin create' : 'Plugin updated',
+                        title: self.plugin_id.plugin_id==null ? 'New plugin create' : 'Plugin updated',
+                        text: self.plugin_id.plugin_id==null ? 'New plugin create' : 'Plugin updated',
                     }).then(function(result) {
                         self.$emit('close-modal',true)
                     })
@@ -208,9 +284,9 @@ module.exports = {
         },
         loadData:function(){
             var self = this
-            if(self.plugin_id!=null){
+            if(self.plugin_id.plugin_id!=null){
                 var params={
-                    id:self.plugin_id
+                    id:self.plugin_id.plugin_id
                 }
                 Utils.apiCall("get", "/kong/plugins",params)
                 .then(function (response) {
@@ -233,6 +309,19 @@ module.exports = {
                     self.form.enable_authorization_code=response.data.config.enable_authorization_code
                     self.form.provision_key=response.data.config.provision_key
                 });
+            }else{
+                self.hint_scopes=false
+                self.form.id=null
+                self.form.name=null
+                self.form.protocols=null
+                self.form.reuse_refresh_token=false
+                self.form.mandatory_scope=true
+                self.form.token_expiration=null
+                self.form.enable_client_credentials=false
+                self.form.enable_authorization_code=true
+                self.form.provision_key=null
+                self.form.enabled=true
+                self.form.scopes=null
             }
         },
     },

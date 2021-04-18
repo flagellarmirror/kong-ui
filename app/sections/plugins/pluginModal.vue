@@ -26,8 +26,9 @@
                         <v-tab
                             v-for="item in tabs"
                             :key="item"
+                            :disabled="!item.enabled"
                         >
-                            {{ item }}
+                            {{ item.name }}
                         </v-tab>
                     </v-tabs>
                 </template>
@@ -35,7 +36,7 @@
             </v-toolbar>
 
             <!-- TABS -->
-            <plugin-component @close-modal="closeModal($event)" :plugin_id="item" v-show="tab==0"></plugin-component>
+            <plugin-component @close-modal="closeModal($event)" :plugin_id="{plugin_id:item,origin:null}" v-show="tab==0"></plugin-component>
 
             <route-component @close-modal="closeModal($event)" :route_id="route" v-show="tab==1"></route-component>
 
@@ -49,11 +50,21 @@
 module.exports={
     data:function() {
         return{
-            plugin:null,
             service:null,
             route:null,
             tabs:[
-                'plugin', 'route', 'service',
+                {
+                    name:'plugin',
+                    enabled:true,
+                },
+                {
+                    name:'route',
+                    enabled:true,
+                },
+                {
+                    name:'service',
+                    enabled:true,
+                }
             ],
             tab: null,
         }
@@ -77,6 +88,12 @@ module.exports={
             if(this.item!=null){
                 this.getPlugin()
             }
+            else{
+                this.tabs=[{
+                    name:'plugin',
+                    enabled:true,
+                }]
+            }
         },
         getPlugin:function(){
             var self=this
@@ -86,13 +103,12 @@ module.exports={
             Utils.apiCall("get", "/kong/plugins",params)
             .then(function (response) {
                 console.log(response)
-                self.plugin=response.data.data
                 if(response.data.service!=null){
                     self.service=response.data.service.id
                 }else{
                     for(var i=0;i<self.tabs.length;i++){
-                        if(self.tabs[i]=='service'){
-                            self.tabs.splice(i,1)
+                        if(self.tabs[i].name=='service'){
+                            self.tabs[i].enabled=false
                         }
                     }
                 }
@@ -100,18 +116,18 @@ module.exports={
                     self.route=response.data.route.id
                 }else{
                     for(var i=0;i<self.tabs.length;i++){
-                        if(self.tabs[i]=='route'){
-                            self.tabs.splice(i,1)
+                        if(self.tabs[i].name=='route'){
+                            self.tabs[i].enabled=false
                         }
                     }
                 }
             }).catch(function(){
                 for(var i=0;i<self.tabs.length;i++){
-                    if(self.tabs[i]=='service'){
-                        self.tabs.splice(i,1)
+                    if(self.tabs[i].name=='service'){
+                        self.tabs[i].enabled=false
                     }
-                    if(self.tabs[i]=='route'){
-                        self.tabs.splice(i,1)
+                    if(self.tabs[i].name=='route'){
+                        self.tabs[i].enabled=false
                     }
                 }
             })
@@ -122,7 +138,8 @@ module.exports={
     },
     components:{
         'plugin-component': httpVueLoader('./pluginComponent.vue' + '?v=' + new Date().getTime()),
-        'route-component': httpVueLoader('./../routes/routeComponent.vue' + '?v=' + new Date().getTime())
+        'route-component': httpVueLoader('./../routes/routeComponent.vue' + '?v=' + new Date().getTime()),
+        'service-component': httpVueLoader('./../services/serviceComponent.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>
