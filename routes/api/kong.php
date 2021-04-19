@@ -60,6 +60,20 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
                         ->withHeader("Content-Type", "application/json");
     });
 
+    $group->delete('/services', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
+
+        $url = $getKongConfig()."/services/".$params['id'];
+        $resp = $utils->apicall($url,'delete');
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
     $group->get('/routes', function (Request $request, Response $response, array $args) use($getKongConfig) {
         $utils = new Utils();
         $params = $utils->getParams($request);
@@ -154,6 +168,20 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
                         ->withHeader("Content-Type", "application/json");
     });
 
+    $group->delete('/plugins', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
+
+        $url = $getKongConfig()."/plugins/".$params['id'];
+        $resp = $utils->apicall($url,'delete');
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
     $group->get('/consumers', function (Request $request, Response $response, array $args) use($getKongConfig) {
         $utils = new Utils();
         $params = $utils->getParams($request);
@@ -181,6 +209,20 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
         $url = $update ? $getKongConfig()."/consumers/".$params['id'] : $getKongConfig()."/consumers/";
         $method = $update ? 'patch' : 'post';
         $resp = $utils->apicall($url,$method,$params);
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->delete('/consumers', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
+
+        $url = $getKongConfig()."/consumers/".$params['id'];
+        $resp = $utils->apicall($url,'delete');
 
         $response->getBody()->write($resp);
         return $response->withStatus(200)
@@ -217,6 +259,46 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
         $url = $update ? $getKongConfig()."/oauth2/".$params['id'] : $getKongConfig()."/oauth2/";
         $method = $update ? 'patch' : 'post';
         $resp = $utils->apicall($url,$method,$params);
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->delete('/oauth', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
+
+        $url = $getKongConfig()."/oauth2/".$params['id'];
+        $resp = $utils->apicall($url,'delete');
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->get('/tokens', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        $url = empty($params['id']) ? $getKongConfig()."/oauth2_tokens/" : $getKongConfig()."/oauth2_tokens/".$params['id'];
+        $resp = $utils->apicall($url,"get");
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->delete('/tokens', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) throw new Exception("Parameter 'id' not found");
+
+        $url = $getKongConfig()."/oauth2_tokens/".$params['id'];
+        $resp = $utils->apicall($url,'delete');
 
         $response->getBody()->write($resp);
         return $response->withStatus(200)

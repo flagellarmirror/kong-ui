@@ -78,6 +78,42 @@
                 "color": false,
                 "class": false
             }
+        },
+        {
+            "title": "Oauths",
+            "subtitle": "Kong oauths",
+            "allowed":[],
+            "visible": true,
+
+            "action":{
+                "path": "/oauths",
+                "component": "../../app/sections/oauth/oauthList.vue"
+            },
+
+            "layout":{
+                "icon":"mdi-view-dashboard-variant",
+                "disabled": false,
+                "color": false,
+                "class": false
+            }
+        },
+        {
+            "title": "Oauth tokens",
+            "subtitle": "Kong oauth tokens",
+            "allowed":[],
+            "visible": true,
+
+            "action":{
+                "path": "/tokens",
+                "component": "../../app/sections/oauth_tokens/tokenList.vue"
+            },
+
+            "layout":{
+                "icon":"mdi-view-dashboard-variant",
+                "disabled": false,
+                "color": false,
+                "class": false
+            }
         }
     ]
 }

@@ -1,16 +1,16 @@
 <template>
     <div>
 
-        <consumer-modal
-            v-if="consumerModal"
-            @close-modal="closeConsumerModal($event)"
+        <oauth-modal
+            v-if="oauthModal"
+            @close-modal="closeOauthModal($event)"
             :item="select"
-        ></consumer-modal>
+        ></oauth-modal>
 
-        <consumers-table
-            ref="consumers"
-            @event="openConsumerModal($event)"
-        ></consumers-table>
+        <oauth-table
+            ref="oauths"
+            @event="openOauthModal($event)"
+        ></oauth-table>
 
     </div>
 </template>
@@ -19,26 +19,26 @@
 module.exports={
     data:function(){
         return{
-            consumerModal: false,
+            oauthModal: false,
             select:null,
         }
     },
     methods: {
-        openConsumerModal:function(id){
+        openOauthModal:function(id){
             this.select=id
-            this.consumerModal=true
+            this.oauthModal=true
         },
-        closeConsumerModal:function(event){
-            this.consumerModal=false
+        closeOauthModal:function(event){
+            this.oauthModal=false
             this.select=null
-            if(event) this.$refs.consumers.getConsumers()
+            if(event) this.$refs.oauths.getOauths()
         },
     },
     created:function() {
     },
     components:{
-        'consumer-modal': httpVueLoader('./consumerModal.vue' + '?v=' + new Date().getTime()),
-        'consumers-table': httpVueLoader('./consumersTable.vue' + '?v=' + new Date().getTime())
+        'oauth-modal': httpVueLoader('./oauthModal.vue' + '?v=' + new Date().getTime()),
+        'oauth-table': httpVueLoader('./oauthTable.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

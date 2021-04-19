@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="routes"
+        :items="plugins"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -31,7 +31,10 @@
             <tr>
                 <template v-for="(header,i) in headers">
                     <td :key="i" v-if="i==0" style="text-align:center">
-                        <v-btn icon>
+                        <v-btn
+                            icon
+                            @click="deleteRow(index)"
+                        >
                             <v-icon>mdi-delete</v-icon>
                         </v-btn>
                         <v-btn
@@ -52,7 +55,7 @@
 module.exports = {
     data:function(){
         return{
-            routes:[],
+            plugins:[],
             headers: [
                 {
                     text: 'Actions',
@@ -98,7 +101,25 @@ module.exports = {
     props:['item'],
     methods: {
         sendEvent:function(index){
-            this.$emit('event',this.routes[index].id)
+            this.$emit('event',this.plugins[index].id)
+        },
+        deleteRow:function(index){
+            var self=this
+            var params={
+                id: this.plugins[index].id
+            }
+            Utils.apiCall("delete", "/kong/plugins",params)
+            .then(function (response) {
+                if(response!=undefined){
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Plugin delete',
+                        text: 'Plugin delete',
+                    }).then(function(result) {
+                        self.getPlugins()
+                    })
+                }
+            });
         },
         getPlugins:function(){
             var self=this
@@ -112,7 +133,7 @@ module.exports = {
                     }
                     tmp.push(response.data.data[i])
                 }
-                self.routes=tmp
+                self.plugins=tmp
             });
         }
     },

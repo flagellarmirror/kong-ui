@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="consumers"
+        :items="oauths"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -31,7 +31,10 @@
             <tr>
                 <template v-for="(header,i) in headers">
                     <td :key="i" v-if="i==0" style="text-align:center">
-                        <v-btn icon>
+                        <v-btn
+                            icon
+                            @click="deleteRow(index)"
+                        >
                             <v-icon>mdi-delete</v-icon>
                         </v-btn>
                         <v-btn
@@ -52,7 +55,7 @@
 module.exports = {
     data:function(){
         return{
-            consumers:[],
+            oauths:[],
             headers: [
                 {
                     text: 'Actions',
@@ -64,7 +67,7 @@ module.exports = {
                     }
                 },
                 {
-                    text: 'Consumer ID',
+                    text: 'Oauths ID',
                     align: 'start',
                     value: 'id',
                     custom:{
@@ -72,15 +75,22 @@ module.exports = {
                     }
                 },
                 {
-                    text: 'Username',
-                    value: 'username',
+                    text: 'Name',
+                    value: 'name',
                     custom:{
                         type:"text"
                     }
                 },
                 {
-                    text: 'Custom id',
-                    value: 'custom_id',
+                    text: 'Client id',
+                    value: 'client_id',
+                    custom:{
+                        type:"text"
+                    }
+                },
+                {
+                    text: 'Consumer ID',
+                    value: 'consumer_id',
                     custom:{
                         type:"text"
                     }
@@ -90,26 +100,44 @@ module.exports = {
     },
     methods: {
         sendEvent:function(index){
-            this.$emit('event',this.consumers[index].id)
+            this.$emit('event',this.oauths[index].id)
         },
-        getConsumers:function(){
+        deleteRow:function(index){
             var self=this
-            Utils.apiCall("get", "/kong/consumers")
+            var params={
+                id: this.oauths[index].id
+            }
+            Utils.apiCall("delete", "/kong/oauth",params)
+            .then(function (response) {
+                if(response!=undefined){
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Oauth delete',
+                        text: 'Oauth delete',
+                    }).then(function(result) {
+                        self.getOauths()
+                    })
+                }
+            });
+        },
+        getOauths:function(){
+            var self=this
+            Utils.apiCall("get", "/kong/oauth")
             .then(function (response) {
                 console.log(response)
                 var tmp=[]
                 for(var i=0;i<response.data.data.length;i++){
-                    if(response.data.data[i].protocols!=null){
-                        response.data.data[i].protocols=response.data.data[i].protocols.join(";")
+                    if(response.data.data[i].consumer){
+                        response.data.data[i].consumer_id=response.data.data[i].consumer.id
                     }
                     tmp.push(response.data.data[i])
                 }
-                self.consumers=tmp
+                self.oauths=tmp
             });
         }
     },
     created:function() {
-        this.getConsumers();
+        this.getOauths();
     },
 }
 </script>

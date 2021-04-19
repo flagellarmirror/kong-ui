@@ -3,7 +3,7 @@
         <v-card>
             <v-toolbar
                 dense
-                color="blue"
+                color="blue-grey"
                 dark
             >
                 <v-toolbar-title>
@@ -23,6 +23,7 @@
                         dark
                         fixed-tabs
                     >
+                        <v-tabs-slider color="yellow"></v-tabs-slider>
                         <v-tab
                             v-for="item in tabs"
                             :key="item"

@@ -102,9 +102,20 @@ module.exports = {
     watch:{
         oauth_id:function(){
             this.loadData()
+            this.getConsumers()
         }
     },
     methods: {
+        getConsumers:function(){
+            var self=this
+            Utils.apiCall("get", "/kong/consumers")
+            .then(function (response) {
+                for(var i=0;i<response.data.data.length;i++){
+                    response.data.data[i].custom=response.data.data[i].username + " ["+response.data.data[i].id+ "]"
+                }
+                self.association_items=response.data.data
+            })
+        },
         submit:function(){
             var self=this
 
@@ -129,6 +140,10 @@ module.exports = {
                 redirect_uris: tmp_redirect_uris,
                 client_id:self.form.client_id,
                 client_secret:self.form.client_secret,
+            }
+            if(self.oauth_id.oauth_id==null){
+                params.consumer={}
+                params.consumer.id=self.association.id
             }
 
             Utils.apiCall("post", "/kong/oauth",params)

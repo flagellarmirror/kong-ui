@@ -4,7 +4,7 @@
             <v-toolbar
                 dense
                 dark
-                color="blue"
+                color="blue-grey"
             >
                 <v-toolbar-title>
                     {{modalTitle}}
@@ -23,6 +23,7 @@
                         dark
                         fixed-tabs
                     >
+                        <v-tabs-slider color="yellow"></v-tabs-slider>
                         <v-tab
                             v-for="item in tabs"
                             :key="item"
@@ -36,11 +37,9 @@
             </v-toolbar>
 
             <!-- TABS -->
-            <consumer-component @close-modal="closeModal($event)" :consumer_id="{consumer_id:item,origin:null}" v-show="tab==0"></consumer-component>
+            <oauth-component @close-modal="closeModal($event)" :oauth_id="{oauth_id:item,origin:null}" v-show="tab==0"></oauth-component>
 
-            <oauth-component @close-modal="closeModal($event)" :oauth_id="{oauth_id:oauth,origin:'consumer'}" v-show="tab==1"></oauth-component>
-
-            <!-- <service-component @close-modal="closeModal($event)" :service_id="service" v-show="tab==2"></service-component> -->
+            <consumer-component @close-modal="closeModal($event)" :consumer_id="{consumer_id:consumer,origin:'oauth'}" v-show="tab==1"></consumer-component>
 
         </v-card>
     </v-dialog>
@@ -51,14 +50,14 @@
 module.exports={
     data:function() {
         return{
-            oauth:null,
+            consumer:null,
             tabs:[
                 {
-                    name:'consumer',
+                    name:'oauth2',
                     enabled:true,
                 },
                 {
-                    name:'oauth2',
+                    name:'consumer',
                     enabled:false,
                 }
             ],
@@ -69,9 +68,9 @@ module.exports={
     computed:{
         modalTitle(){
             if(this.item!=null){
-                return 'Modify consumer: '+this.item
+                return 'Modify oauth: '+this.item
             }else{
-                return "Create consumer"
+                return "Create oauth"
             }
 
         },
@@ -82,27 +81,25 @@ module.exports={
         },
         loadData:function(){
             if(this.item!=null){
-                this.getOauth()
+                this.getConsumer()
             }
             else{
                 this.tabs=[{
-                    name:'consumer',
+                    name:'oauth',
                     enabled:true,
                 }]
             }
         },
-        getOauth:function(){
+        getConsumer:function(){
             var self=this
             Utils.apiCall("get", "/kong/oauth")
             .then(function (response) {
                 console.log(response)
                 for(var i=0;i<response.data.data.length;i++){
                     if(response.data.data[i].consumer!=null){
-                        if(response.data.data[i].consumer.id==self.item){
-                            self.oauth=response.data.data[i].id
-                            self.tabs[1].enabled=true
-                            break
-                        }
+                        self.consumer=response.data.data[i].consumer.id
+                        self.tabs[1].enabled=true
+                        break
                     }
                 }
             })
@@ -112,8 +109,8 @@ module.exports={
         this.loadData()
     },
     components:{
-        'consumer-component': httpVueLoader('./consumerComponent.vue' + '?v=' + new Date().getTime()),
-        'oauth-component': httpVueLoader('./../oauth/oauthComponent.vue' + '?v=' + new Date().getTime())
+        'consumer-component': httpVueLoader('./../consumers/consumerComponent.vue' + '?v=' + new Date().getTime()),
+        'oauth-component': httpVueLoader('./oauthComponent.vue' + '?v=' + new Date().getTime())
     }
 }
 </script>

@@ -4,7 +4,7 @@
             <v-toolbar
                 dense
                 dark
-                color="blue"
+                color="blue-grey"
             >
                 <v-toolbar-title>
                     {{modalTitle}}
@@ -23,6 +23,7 @@
                         dark
                         fixed-tabs
                     >
+                        <v-tabs-slider color="yellow"></v-tabs-slider>
                         <v-tab
                             v-for="item in tabs"
                             :key="item"
