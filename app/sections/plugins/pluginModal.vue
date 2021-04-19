@@ -38,7 +38,7 @@
             <!-- TABS -->
             <plugin-component @close-modal="closeModal($event)" :plugin_id="{plugin_id:item,origin:null}" v-show="tab==0"></plugin-component>
 
-            <route-component @close-modal="closeModal($event)" :route_id="route" v-show="tab==1"></route-component>
+            <route-component @close-modal="closeModal($event)" :route_id="{route_id:route,origin:'plugin'}" v-show="tab==1"></route-component>
 
             <service-component @close-modal="closeModal($event)" :service_id="service" v-show="tab==2"></service-component>
 

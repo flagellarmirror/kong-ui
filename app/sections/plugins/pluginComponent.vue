@@ -189,11 +189,8 @@ module.exports = {
     watch:{
         plugin_id:function(){
             this.loadData()
-            console.log("quiiii")
-            console.log(this.plugin_id)
         },
         'association.type':function(){
-            console.log("cambia")
             if(this.association.type=='route') this.getRoutes()
             if(this.association.type=='service') this.getServices()
         }

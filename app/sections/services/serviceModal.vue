@@ -29,7 +29,38 @@
                         >
                             {{ item }}
                         </v-tab>
-                        <v-tab>
+                        <v-tab v-if="item!=null">
+                            <v-menu
+                                v-if="more_route.length"
+                                bottom
+                                left
+                            >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                    text
+                                    class="align-self-center mr-4"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    >
+                                    routes
+                                    <v-icon right>
+                                        mdi-menu-down
+                                    </v-icon>
+                                    </v-btn>
+                                </template>
+
+                                <v-list class="grey lighten-3">
+                                    <v-list-item
+                                    v-for="item in more_route"
+                                    :key="item"
+                                    @click="selectRoute(item)"
+                                    >
+                                    {{ item.custom }}
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                        </v-tab>
+                        <v-tab v-if="item!=null">
                             <v-menu
                                 v-if="more.length"
                                 bottom
@@ -68,23 +99,7 @@
             <!-- TABS -->
             <service-component @close-modal="closeModal($event)" :service_id="item" v-show="tab==0"></service-component>
 
-            <template v-if="tab==1">
-                <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
-                    <v-flex xs12>
-                        <v-select
-                            outlined
-                            dense
-                            hide-details
-                            label="Select route"
-                            :items="routes"
-                            item-text="custom"
-                            item-value="id"
-                            v-model="route"
-                        ></v-select>
-                    </v-flex>
-                </v-layout>
-                <route-component :route_id="route" v-show="tab==1"></route-component>
-            </template>
+            <route-component :route_id="route" v-show="tab==1"></route-component>
 
             <plugin-component @close-modal="closeModal($event)" :plugin_id="plugin" v-show="tab==2"></plugin-component>
         </v-card>
@@ -97,13 +112,22 @@ module.exports={
         return{
             routes:[],
             plugins:[],
-            plugin:{plugin_id:null},
+            plugin:{
+                plugin_id:null,
+                origin:'service',
+                origin_id:this.item
+            },
             tabs:[
-                'service', 'routes'
+                'service'
             ],
             more:[{custom:'add plugin'}],
+            more_route:[{custom:'add route'}],
             tab: null,
-            route:null,
+            route:{
+                route_id:null,
+                origin:'service',
+                origin_id:this.item
+            },
         }
     },
     props:['item'],
@@ -118,6 +142,16 @@ module.exports={
         },
     },
     methods: {
+        selectRoute:function(route){
+            console.log(route.id)
+            var tmp={
+                route_id: route.id!=undefined ? route.id : null,
+                origin:'service',
+                origin_id:this.item
+            }
+            this.route=tmp
+            this.tab=1
+        },
         selectPlugin:function(plugin){
             console.log(plugin.id)
             var tmp={
@@ -142,19 +176,15 @@ module.exports={
             Utils.apiCall("get", "/kong/routes")
             .then(function (response) {
                 var tmp=[]
+                var tmp_routes=[{custom:'add plugin'}]
                 for(var i=0;i<response.data.data.length;i++){
                     response.data.data[i].custom=response.data.data[i].name + " ["+response.data.data[i].id+ "]"
                     if(response.data.data[i].service!=null&&response.data.data[i].service.id==self.item){
                         tmp.push(response.data.data[i])
+                        tmp_routes.push(response.data.data[i])
                     }
                 }
-                if(tmp.length==0){
-                    for(var i=0;i<self.tabs.length;i++){
-                        if(self.tabs[i]=='routes'){
-                            self.tabs.splice(i,1)
-                        }
-                    }
-                }
+                self.more_route=tmp_routes
                 self.routes=tmp
             });
         },

@@ -85,17 +85,9 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
 
         $update=false;
         if(!empty($params['id'])) $update=true;
+        if(!$update&&empty($params['service']['id'])) throw new Exception("'Id service' not found");
         if(empty($params['protocols'])) throw new Exception("Parameter 'protocols' not found");
         if(!$update&&empty($params['paths'])) throw new Exception("Parameter 'paths' not found");
-        if(!$update&&empty($params['service'])) {
-            throw new Exception("Parameter 'service' not found");
-        }else if(!$update){
-            $tmp=$params['service'];
-            $params['service'] = [];
-            $params['service']['id'] = $tmp;
-        }else{
-            unset($params['service']);
-        }
 
         $url = $update ? $getKongConfig()."/routes/".$params['id'] : $getKongConfig()."/routes/";
         $method = $update ? 'patch' : 'post';

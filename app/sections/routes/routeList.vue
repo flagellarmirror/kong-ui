@@ -9,7 +9,7 @@
 
         <routes-table
             ref="routes"
-            :item="{hide_link:false, hide_new_row:true}"
+            :item="{hide_link:false, hide_new_row:false}"
             @event="openRouteModal($event)"
         ></routes-table>
 

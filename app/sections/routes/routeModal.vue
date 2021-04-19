@@ -26,10 +26,11 @@
                         <v-tab
                             v-for="item in tabs"
                             :key="item"
+                            :disabled="!item.enabled"
                         >
-                            {{ item }}
+                            {{ item.name }}
                         </v-tab>
-                        <v-tab>
+                        <v-tab v-if="item!=null">
                             <v-menu
                                 v-if="more.length"
                                 bottom
@@ -66,7 +67,7 @@
             </v-toolbar>
 
             <!-- TABS -->
-            <route-component @close-modal="closeModal($event)" :route_id="item" v-show="tab==0"></route-component>
+            <route-component @close-modal="closeModal($event)" :route_id="{route_id:item,origin:null}" v-show="tab==0"></route-component>
 
             <service-component @close-modal="closeModal($event)" :service_id="service" v-show="tab==1"></service-component>
 
@@ -81,9 +82,20 @@ module.exports={
     data:function() {
         return{
             plugins:[],
-            plugin:{plugin_id:null},
+            plugin:{
+                plugin_id:null,
+                origin:'route',
+                origin_id:this.item
+            },
             tabs:[
-                'route', 'service'
+                {
+                    name:'route',
+                    enabled:true,
+                },
+                {
+                    name:'service',
+                    enabled:true,
+                }
             ],
             more:[{custom:'add plugin'}],
             tab: null,
@@ -119,6 +131,13 @@ module.exports={
             if(this.item!=null){
                 this.getRoute()
                 this.getPlugins()
+            }else{
+                this.tabs=[
+                    {
+                        name:'route',
+                        enabled:true,
+                    }
+                ]
             }
         },
         getRoute:function(){
@@ -132,15 +151,15 @@ module.exports={
                     self.service=response.data.service.id
                 }else{
                     for(var i=0;i<self.tabs.length;i++){
-                        if(self.tabs[i]=='service'){
-                            self.tabs.splice(i,1)
+                        if(self.tabs[i].name=='service'){
+                            self.tabs[i].enabled=false
                         }
                     }
                 }
             }).catch(function(){
                 for(var i=0;i<self.tabs.length;i++){
-                    if(self.tabs[i]=='service'){
-                        self.tabs.splice(i,1)
+                    if(self.tabs[i].name=='service'){
+                        self.tabs[i].enabled=false
                     }
                 }
             })

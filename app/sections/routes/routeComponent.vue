@@ -1,6 +1,19 @@
 <template>
     <v-card flat>
         <v-layout row wrap mb-0 mt-0 ml-2 mr-2 pt-3>
+            <v-flex xs12 pb-3 v-if="route_id.route_id==null&&route_id.origin==null">
+                <v-select
+                    outlined
+                    dense
+                    hide-details
+                    label="Association id"
+                    item-text="custom"
+                    item-value="id"
+                    :items="association_items"
+                    v-model="association.id"
+                ></v-select>
+            </v-flex>
+
             <v-flex xs4 pr-2 pb-3>
                 <v-text-field
                     outlined
@@ -85,6 +98,9 @@ module.exports = {
     data:function(){
         return{
             routes:[],
+            association:{
+                id:null
+            },
             form:{
                 id:null,
                 name:null,
@@ -95,6 +111,7 @@ module.exports = {
             },
             hint_hosts:false,
             hint_paths:false,
+            association_items:[],
             methods_items:[
                 "GET",
                 "POST",
@@ -112,9 +129,20 @@ module.exports = {
     watch:{
         route_id:function(){
             this.loadData()
+            this.getServices()
         }
     },
     methods: {
+        getServices:function(){
+            var self=this
+            Utils.apiCall("get", "/kong/services")
+            .then(function (response) {
+                for(var i=0;i<response.data.data.length;i++){
+                    response.data.data[i].custom=response.data.data[i].name + " ["+response.data.data[i].id+ "]"
+                }
+                self.association_items=response.data.data
+            })
+        },
         submit:function(){
             var self=this
 
@@ -155,6 +183,15 @@ module.exports = {
                 methods: this.form.methods,
                 paths: tmp_paths,
             }
+            if(this.route_id.route_id==null&&this.route_id.origin==null){
+                params.service={}
+                params.service.id=this.association.id
+            }else{
+                if (this.route_id.origin=='service'){
+                    params.service={}
+                    params.service.id=this.route_id.origin_id
+                }
+            }
 
             Utils.apiCall("post", "/kong/routes",params)
             .then(function (response) {
@@ -171,9 +208,9 @@ module.exports = {
         },
         loadData:function(){
             var self = this
-            if(self.route_id!=null){
+            if(self.route_id.route_id!=null){
                 var params={
-                    id:self.route_id
+                    id:self.route_id.route_id
                 }
                 Utils.apiCall("get", "/kong/routes",params)
                 .then(function (response) {
@@ -197,6 +234,15 @@ module.exports = {
                         }
                     }
                 });
+            }else{
+                self.form.id=null
+                self.form.name=null
+                self.form.protocols=null
+                self.form.hosts=null
+                self.form.methods=null
+                self.form.paths=null
+                self.hint_hosts=false
+                self.hint_paths=false
             }
         },
     },

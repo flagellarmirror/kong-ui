@@ -87,8 +87,6 @@ module.exports = {
     props:["service_id"],
     watch:{
         service_id:function(){
-            console.log("qioooo")
-            console.log(this.service_id)
             this.loadData()
         }
     },
