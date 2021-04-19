@@ -58,7 +58,7 @@
                     outlined
                     dense
                     hide-details="auto"
-                    label="Hosts"
+                    label="Redirect uris"
                     :hint="hint_redirect_uris ? 'The separator is ;' : ''"
                     append-icon="mdi-help-circle"
                     @click:append="hint_redirect_uris=!hint_redirect_uris"

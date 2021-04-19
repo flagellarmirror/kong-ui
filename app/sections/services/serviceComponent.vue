@@ -116,8 +116,8 @@ module.exports = {
                 if(response!=undefined){
                     Swal.fire({
                         type: 'success',
-                        title: self.service_id.service_id==null ? 'New service create' : 'Service updated',
-                        text: self.service_id.service_id==null ? 'New service create' : 'Service updated',
+                        title: self.service_id==null ? 'New service create' : 'Service updated',
+                        text: self.service_id==null ? 'New service create' : 'Service updated',
                     }).then(function(result) {
                         self.$emit('close-modal',true)
                     })
