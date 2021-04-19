@@ -55,11 +55,11 @@ module.exports={
             oauth:null,
             tabs:[
                 {
-                    name:'oauth2',
+                    name:'consumer',
                     enabled:true,
                 },
                 {
-                    name:'consumer',
+                    name:'oauth2',
                     enabled:false,
                 }
             ],
