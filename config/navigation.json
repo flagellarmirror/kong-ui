@@ -60,6 +60,24 @@
                 "color": false,
                 "class": false
             }
+        },
+        {
+            "title": "Consumers",
+            "subtitle": "Kong consumers",
+            "allowed":[],
+            "visible": true,
+
+            "action":{
+                "path": "/consumers",
+                "component": "../../app/sections/consumers/consumerList.vue"
+            },
+
+            "layout":{
+                "icon":"mdi-view-dashboard-variant",
+                "disabled": false,
+                "color": false,
+                "class": false
+            }
         }
     ]
 }

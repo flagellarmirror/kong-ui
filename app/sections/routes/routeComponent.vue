@@ -198,8 +198,8 @@ module.exports = {
                 if(response!=undefined){
                     Swal.fire({
                         type: 'success',
-                        title: self.route_id==null ? 'New route create' : 'Route updated',
-                        text: self.route_id==null ? 'New route create' : 'Route updated',
+                        title: self.route_id.route_id==null ? 'New route create' : 'Route updated',
+                        text: self.route_id.route_id==null ? 'New route create' : 'Route updated',
                     }).then(function(result) {
                         self.$emit('close-modal',true)
                     })

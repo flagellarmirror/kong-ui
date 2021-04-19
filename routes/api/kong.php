@@ -153,4 +153,73 @@ $app->group('/kong', function (RouteCollectorProxy $group) {
         return $response->withStatus(200)
                         ->withHeader("Content-Type", "application/json");
     });
+
+    $group->get('/consumers', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        $url = empty($params['id']) ? $getKongConfig()."/consumers/" : $getKongConfig()."/consumers/".$params['id'];
+        $resp = $utils->apicall($url,"get");
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->post('/consumers', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) unset($params['id']);
+        if(empty($params['username'])) unset($params['username']);
+        if(empty($params['custom_id'])) unset($params['custom_id']);
+
+        $update=false;
+        if(!empty($params['id'])) $update=true;
+        if(empty($params['username'])) throw new Exception("Parameter 'Username' not found");
+
+        $url = $update ? $getKongConfig()."/consumers/".$params['id'] : $getKongConfig()."/consumers/";
+        $method = $update ? 'patch' : 'post';
+        $resp = $utils->apicall($url,$method,$params);
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->get('/oauth', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        $url = empty($params['id']) ? $getKongConfig()."/oauth2/" : $getKongConfig()."/oauth2/".$params['id'];
+        $resp = $utils->apicall($url,"get");
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
+
+    $group->post('/oauth', function (Request $request, Response $response, array $args) use($getKongConfig) {
+        $utils = new Utils();
+        $params = $utils->getParams($request);
+
+        if(empty($params['id'])) unset($params['id']);
+        if(empty($params['name'])) unset($params['name']);
+        if(empty($params['redirect_uris'])) $params['redirect_uris']=null;
+        if(empty($params['client_id'])) unset($params['client_id']);
+        if(empty($params['client_secret'])) unset($params['client_secret']);
+
+        $update=false;
+        if(!empty($params['id'])) $update=true;
+        if(empty($params['name'])) throw new Exception("Parameter 'name' not found");
+        if(!$update&&empty($params['consumer']['id'])&&empty($params['consumer']['id'])) throw new Exception("'Id consumer' not found");
+
+        $url = $update ? $getKongConfig()."/oauth2/".$params['id'] : $getKongConfig()."/oauth2/";
+        $method = $update ? 'patch' : 'post';
+        $resp = $utils->apicall($url,$method,$params);
+
+        $response->getBody()->write($resp);
+        return $response->withStatus(200)
+                        ->withHeader("Content-Type", "application/json");
+    });
 });
