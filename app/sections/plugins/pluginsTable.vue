@@ -94,7 +94,14 @@ module.exports = {
                     custom:{
                         type:"text"
                     }
-                }
+                },
+                {
+                    text: 'Created at',
+                    value: 'custom_data',
+                    custom:{
+                        type:"text"
+                    }
+                },
             ],
         }
     },
@@ -131,6 +138,7 @@ module.exports = {
                     if(response.data.data[i].protocols!=null){
                         response.data.data[i].protocols=response.data.data[i].protocols.join(";")
                     }
+                    response.data.data[i].custom_data=moment.unix(response.data.data[i].created_at).format("MM-DD-YYYY HH:mm:ss")
                     tmp.push(response.data.data[i])
                 }
                 self.plugins=tmp

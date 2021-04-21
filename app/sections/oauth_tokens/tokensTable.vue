@@ -102,6 +102,13 @@ module.exports = {
                         type:"text"
                     }
                 },
+                {
+                    text: 'Created at',
+                    value: 'custom_data',
+                    custom:{
+                        type:"text"
+                    }
+                },
             ],
         }
     },
@@ -140,6 +147,7 @@ module.exports = {
                     if(response.data.data[i].service!=null){
                         response.data.data[i].service_id=response.data.data[i].service.id
                     }
+                    response.data.data[i].custom_data=moment.unix(response.data.data[i].created_at).format("MM-DD-YYYY HH:mm:ss")
                     tmp.push(response.data.data[i])
                 }
                 self.tokens=tmp

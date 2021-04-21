@@ -63,9 +63,8 @@ module.exports = {
                     align: 'center',
                     sortable: false,
                     custom:{
-                        type: this.item.hide_new_row==undefined||!this.item.hide_new_row ? 'btn' : null
+                        type: 'btn'
                     },
-                    visible:true,
                 },
                 {
                     text: 'Route ID',
@@ -74,7 +73,6 @@ module.exports = {
                     custom:{
                         type:"text"
                     },
-                    visible:true,
                 },
                 {
                     text: 'Name',
@@ -82,7 +80,6 @@ module.exports = {
                     custom:{
                         type:"text"
                     },
-                    visible:true,
                 },
                 {
                     text: 'Hosts',
@@ -90,7 +87,6 @@ module.exports = {
                     custom:{
                         type:"text"
                     },
-                    visible:true,
                 },
                 {
                     text: 'Paths',
@@ -98,7 +94,6 @@ module.exports = {
                     custom:{
                         type:"text"
                     },
-                    visible:true,
                 },
                 {
                     text: 'Methods',
@@ -106,15 +101,13 @@ module.exports = {
                     custom:{
                         type:"text"
                     },
-                    visible:true,
                 },
                 {
-                    text: 'Service ID',
-                    value: 'service_id',
+                    text: 'Created at',
+                    value: 'custom_data',
                     custom:{
                         type:"text"
                     },
-                    visible:this.item.hide_link==undefined ? true : !this.item.hide_link
                 },
             ],
         }
@@ -164,17 +157,13 @@ module.exports = {
                     if(response.data.data[i].service.id!=null){
                         response.data.data[i].service_id=response.data.data[i].service.id
                     }
+                    response.data.data[i].custom_data=moment.unix(response.data.data[i].created_at).format("MM-DD-YYYY HH:mm:ss")
                 }
                 self.routes=tmp
             });
         }
     },
     created:function() {
-        var tmp=[]
-        for(var i=0;i<this.headers.length;i++){
-            if(this.headers[i].visible) tmp.push(this.headers[i])
-        }
-        this.headers=tmp
         this.getRoutes();
     },
 }

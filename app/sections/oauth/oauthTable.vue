@@ -95,6 +95,13 @@ module.exports = {
                         type:"text"
                     }
                 },
+                {
+                    text: 'Created at',
+                    value: 'custom_data',
+                    custom:{
+                        type:"text"
+                    }
+                },
             ],
         }
     },
@@ -130,6 +137,7 @@ module.exports = {
                     if(response.data.data[i].consumer){
                         response.data.data[i].consumer_id=response.data.data[i].consumer.id
                     }
+                    response.data.data[i].custom_data=moment.unix(response.data.data[i].created_at).format("MM-DD-YYYY HH:mm:ss")
                     tmp.push(response.data.data[i])
                 }
                 self.oauths=tmp

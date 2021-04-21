@@ -101,6 +101,13 @@ module.exports = {
                         type:"text"
                     }
                 },
+                {
+                    text: 'Created at',
+                    value: 'custom_data',
+                    custom:{
+                        type:"text"
+                    }
+                },
             ],
         }
     },
@@ -131,6 +138,9 @@ module.exports = {
             var self=this
             Utils.apiCall("get", "/kong/services")
             .then(function (response) {
+                for(var i=0;i<response.data.data.length;i++){
+                    response.data.data[i].custom_data=moment.unix(response.data.data[i].created_at).format("MM-DD-YYYY HH:mm:ss")
+                }
                 self.services=response.data.data
             });
         },
