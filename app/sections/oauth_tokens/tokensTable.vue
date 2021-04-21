@@ -2,6 +2,8 @@
     <v-data-table
         :headers="headers"
         :items="tokens"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -55,6 +57,8 @@
 module.exports = {
     data:function(){
         return{
+            sortBy: 'custom_data',
+            sortDesc: true,
             tokens:[],
             headers: [
                 {
