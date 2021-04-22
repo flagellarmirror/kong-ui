@@ -119,21 +119,34 @@ module.exports = {
         },
         deleteRow:function(index){
             var self=this
-            var params={
-                id: this.routes[index].id
-            }
-            Utils.apiCall("delete", "/kong/routes",params)
-            .then(function (response) {
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Route delete',
-                        text: 'Route delete',
-                    }).then(function(result) {
-                        self.getRoutes()
-                    })
+            Swal.fire({
+                title: 'Delete route',
+                text: "Are you sure you want to delete route?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f86c6b',
+                cancelButtonColor: '#20a8d8',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Back'
+            }).then( function (result) {
+                if(result.value){
+                    var params={
+                        id: self.routes[index].id
+                    }
+                    Utils.apiCall("delete", "/kong/routes",params)
+                    .then(function (response) {
+                        if(response!=undefined){
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Route delete',
+                                text: 'Route delete',
+                            }).then(function(result) {
+                                self.getRoutes()
+                            })
+                        }
+                    });
                 }
-            });
+            })
         },
         getRoutes:function(){
             var self=this

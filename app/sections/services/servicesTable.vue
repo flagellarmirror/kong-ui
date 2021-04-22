@@ -118,21 +118,34 @@ module.exports = {
         },
         deleteRow:function(index){
             var self=this
-            var params={
-                id: this.services[index].id
-            }
-            Utils.apiCall("delete", "/kong/services",params)
-            .then(function (response) {
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Service delete',
-                        text: 'Service delete',
-                    }).then(function(result) {
-                        self.getServices()
-                    })
+            Swal.fire({
+                title: 'Delete service',
+                text: "Are you sure you want to delete service?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f86c6b',
+                cancelButtonColor: '#20a8d8',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Back'
+            }).then( function (result) {
+                if(result.value){
+                    var params={
+                        id: self.services[index].id
+                    }
+                    Utils.apiCall("delete", "/kong/services",params)
+                    .then(function (response) {
+                        if(response!=undefined){
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Service delete',
+                                text: 'Service delete',
+                            }).then(function(result) {
+                                self.getServices()
+                            })
+                        }
+                    });
                 }
-            });
+            })
         },
         getServices:function(){
             var self=this

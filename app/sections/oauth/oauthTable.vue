@@ -111,21 +111,34 @@ module.exports = {
         },
         deleteRow:function(index){
             var self=this
-            var params={
-                id: this.oauths[index].id
-            }
-            Utils.apiCall("delete", "/kong/oauth",params)
-            .then(function (response) {
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Oauth delete',
-                        text: 'Oauth delete',
-                    }).then(function(result) {
-                        self.getOauths()
-                    })
+            Swal.fire({
+                title: 'Delete oauth',
+                text: "Are you sure you want to delete oauth?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f86c6b',
+                cancelButtonColor: '#20a8d8',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Back'
+            }).then( function (result) {
+                if(result.value){
+                    var params={
+                        id: self.oauths[index].id
+                    }
+                    Utils.apiCall("delete", "/kong/oauth",params)
+                    .then(function (response) {
+                        if(response!=undefined){
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Oauth delete',
+                                text: 'Oauth delete',
+                            }).then(function(result) {
+                                self.getOauths()
+                            })
+                        }
+                    });
                 }
-            });
+            })
         },
         getOauths:function(){
             var self=this

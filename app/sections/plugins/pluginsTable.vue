@@ -112,21 +112,34 @@ module.exports = {
         },
         deleteRow:function(index){
             var self=this
-            var params={
-                id: this.plugins[index].id
-            }
-            Utils.apiCall("delete", "/kong/plugins",params)
-            .then(function (response) {
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Plugin delete',
-                        text: 'Plugin delete',
-                    }).then(function(result) {
-                        self.getPlugins()
-                    })
+            Swal.fire({
+                title: 'Delete plugin',
+                text: "Are you sure you want to delete plugin?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f86c6b',
+                cancelButtonColor: '#20a8d8',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Back'
+            }).then( function (result) {
+                if(result.value){
+                    var params={
+                        id: self.plugins[index].id
+                    }
+                    Utils.apiCall("delete", "/kong/plugins",params)
+                    .then(function (response) {
+                        if(response!=undefined){
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Plugin delete',
+                                text: 'Plugin delete',
+                            }).then(function(result) {
+                                self.getPlugins()
+                            })
+                        }
+                    });
                 }
-            });
+            })
         },
         getPlugins:function(){
             var self=this

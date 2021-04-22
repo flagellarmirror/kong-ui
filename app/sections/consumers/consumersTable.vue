@@ -104,21 +104,34 @@ module.exports = {
         },
         deleteRow:function(index){
             var self=this
-            var params={
-                id: this.consumers[index].id
-            }
-            Utils.apiCall("delete", "/kong/consumers",params)
-            .then(function (response) {
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Consumer delete',
-                        text: 'Consumer delete',
-                    }).then(function(result) {
-                        self.getConsumers()
-                    })
+            Swal.fire({
+                title: 'Delete consumer',
+                text: "Are you sure you want to delete consumer?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f86c6b',
+                cancelButtonColor: '#20a8d8',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Back'
+            }).then( function (result) {
+                if(result.value){
+                    var params={
+                        id: self.consumers[index].id
+                    }
+                    Utils.apiCall("delete", "/kong/consumers",params)
+                    .then(function (response) {
+                        if(response!=undefined){
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Consumer delete',
+                                text: 'Consumer delete',
+                            }).then(function(result) {
+                                self.getConsumers()
+                            })
+                        }
+                    });
                 }
-            });
+            })
         },
         getConsumers:function(){
             var self=this

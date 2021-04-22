@@ -122,21 +122,34 @@ module.exports = {
         },
         deleteRow:function(index){
             var self=this
-            var params={
-                id: this.tokens[index].id
-            }
-            Utils.apiCall("delete", "/kong/tokens",params)
-            .then(function (response) {
-                if(response!=undefined){
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Token delete',
-                        text: 'Token delete',
-                    }).then(function(result) {
-                        self.getTokens()
-                    })
+            Swal.fire({
+                title: 'Delete token',
+                text: "Are you sure you want to delete token?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f86c6b',
+                cancelButtonColor: '#20a8d8',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Back'
+            }).then( function (result) {
+                if(result.value){
+                    var params={
+                        id: self.tokens[index].id
+                    }
+                    Utils.apiCall("delete", "/kong/tokens",params)
+                    .then(function (response) {
+                        if(response!=undefined){
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Token delete',
+                                text: 'Token delete',
+                            }).then(function(result) {
+                                self.getTokens()
+                            })
+                        }
+                    });
                 }
-            });
+            })
         },
         getTokens:function(){
             var self=this
