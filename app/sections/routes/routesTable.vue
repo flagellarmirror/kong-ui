@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="routes"
+        :items="routes_filtered"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -15,13 +15,16 @@
                             solo
                             dense
                             hide-details
+                            clearable
+                            @input="filter()"
+                            v-model="head.custom.value"
                         ></v-text-field>
                         <v-btn
                             v-if="head.custom.type=='btn'"
                             icon
                             @click="$emit('event',null)"
                         >
-                        <v-icon>mdi-plus</v-icon>
+                            <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </th>
                 </template>
@@ -56,6 +59,7 @@ module.exports = {
     data:function(){
         return{
             routes:[],
+            routes_filtered:[],
             headers: [
                 {
                     text: 'Actions',
@@ -71,42 +75,48 @@ module.exports = {
                     align: 'start',
                     value: 'id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     },
                 },
                 {
                     text: 'Name',
                     value: 'name',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     },
                 },
                 {
                     text: 'Hosts',
                     value: 'hosts',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     },
                 },
                 {
                     text: 'Paths',
                     value: 'paths',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     },
                 },
                 {
                     text: 'Methods',
                     value: 'methods',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     },
                 },
                 {
                     text: 'Created at',
                     value: 'custom_data',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     },
                 },
             ],
@@ -115,7 +125,26 @@ module.exports = {
     props:['item'],
     methods: {
         sendEvent:function(index){
-            this.$emit('event',this.routes[index].id)
+            this.$emit('event',this.routes_filtered[index].id)
+        },
+        filter:function(){
+            this.routes_filtered=JSON.parse(JSON.stringify(this.routes))
+            for(var i=this.routes_filtered.length-1;i>=0;i--){
+                for(var k=1;k<this.headers.length;k++){
+                    if(this.routes_filtered[i][this.headers[k].value]==null) {
+                        if(this.headers[k].custom.value!=null&&this.headers[k].custom.value!=''){
+                            this.routes_filtered.splice(i,1)
+                            break
+                        }
+                    }else{
+                        if(this.headers[k].custom.value==null) continue
+                        if(!this.routes_filtered[i][this.headers[k].value].toLowerCase().includes(this.headers[k].custom.value.toLowerCase())){
+                            this.routes_filtered.splice(i,1)
+                            break
+                        }
+                    }
+                }
+            }
         },
         deleteRow:function(index){
             var self=this
@@ -131,7 +160,7 @@ module.exports = {
             }).then( function (result) {
                 if(result.value){
                     var params={
-                        id: self.routes[index].id
+                        id: self.routes_filtered[index].id
                     }
                     Utils.apiCall("delete", "/kong/routes",params)
                     .then(function (response) {
@@ -173,6 +202,8 @@ module.exports = {
                     response.data.data[i].custom_data=moment.unix(response.data.data[i].created_at).format("MM-DD-YYYY HH:mm:ss")
                 }
                 self.routes=tmp
+                self.routes_filtered=self.routes
+                self.filter()
             });
         }
     },

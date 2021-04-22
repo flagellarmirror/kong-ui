@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="oauths"
+        :items="oauths_filtered"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -15,6 +15,9 @@
                             solo
                             dense
                             hide-details
+                            clearable
+                            @input="filter"
+                            v-model="head.custom.value"
                         ></v-text-field>
                         <v-btn
                             v-if="head.custom.type=='btn'"
@@ -56,6 +59,7 @@ module.exports = {
     data:function(){
         return{
             oauths:[],
+            oauths_filtered:[],
             headers: [
                 {
                     text: 'Actions',
@@ -71,35 +75,40 @@ module.exports = {
                     align: 'start',
                     value: 'id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Name',
                     value: 'name',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Client id',
                     value: 'client_id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Consumer ID',
                     value: 'consumer_id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Created at',
                     value: 'custom_data',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
             ],
@@ -107,7 +116,26 @@ module.exports = {
     },
     methods: {
         sendEvent:function(index){
-            this.$emit('event',this.oauths[index].id)
+            this.$emit('event',this.oauths_filtered[index].id)
+        },
+        filter:function(){
+            this.oauths_filtered=JSON.parse(JSON.stringify(this.oauths))
+            for(var i=this.oauths_filtered.length-1;i>=0;i--){
+                for(var k=1;k<this.headers.length;k++){
+                    if(this.oauths_filtered[i][this.headers[k].value]==null) {
+                        if(this.headers[k].custom.value!=null&&this.headers[k].custom.value!=''){
+                            this.oauths_filtered.splice(i,1)
+                            break
+                        }
+                    }else{
+                        if(this.headers[k].custom.value==null) continue
+                        if(!this.oauths_filtered[i][this.headers[k].value].toLowerCase().includes(this.headers[k].custom.value.toLowerCase())){
+                            this.oauths_filtered.splice(i,1)
+                            break
+                        }
+                    }
+                }
+            }
         },
         deleteRow:function(index){
             var self=this
@@ -123,7 +151,7 @@ module.exports = {
             }).then( function (result) {
                 if(result.value){
                     var params={
-                        id: self.oauths[index].id
+                        id: self.oauths_filtered[index].id
                     }
                     Utils.apiCall("delete", "/kong/oauth",params)
                     .then(function (response) {
@@ -154,6 +182,8 @@ module.exports = {
                     tmp.push(response.data.data[i])
                 }
                 self.oauths=tmp
+                self.oauths_filtered=self.oauths
+                self.filter()
             });
         }
     },

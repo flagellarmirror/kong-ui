@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="services"
+        :items="services_filtered"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -15,13 +15,16 @@
                             solo
                             dense
                             hide-details
+                            clearable
+                            @input="filter()"
+                            v-model="head.custom.value"
                         ></v-text-field>
                         <v-btn
                             v-if="head.custom.type=='btn'"
                             icon
                             @click="sendEvent()"
                         >
-                        <v-icon>mdi-plus</v-icon>
+                            <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </th>
                 </template>
@@ -55,6 +58,7 @@ module.exports = {
     data:function() {
         return {
             services:[],
+            services_filtered:[],
             headers: [
                 {
                     text: 'Actions',
@@ -70,42 +74,48 @@ module.exports = {
                     align: 'start',
                     value: 'id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Name',
                     value: 'name',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Host',
                     value: 'host',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Path',
                     value: 'path',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Protocol',
                     value: 'protocol',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Created at',
                     value: 'custom_data',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
             ],
@@ -114,7 +124,26 @@ module.exports = {
     props:['service_id'],
     methods: {
         sendEvent:function(index){
-            this.$emit('event',index!=undefined ? this.services[index].id : null)
+            this.$emit('event',index!=undefined ? this.services_filtered[index].id : null)
+        },
+        filter:function(){
+            this.services_filtered=JSON.parse(JSON.stringify(this.services))
+            for(var i=this.services_filtered.length-1;i>=0;i--){
+                for(var k=1;k<this.headers.length;k++){
+                    if(this.services_filtered[i][this.headers[k].value]==null) {
+                        if(this.headers[k].custom.value!=null&&this.headers[k].custom.value!=''){
+                            this.services_filtered.splice(i,1)
+                            break
+                        }
+                    }else{
+                        if(this.headers[k].custom.value==null) continue
+                        if(!this.services_filtered[i][this.headers[k].value].toLowerCase().includes(this.headers[k].custom.value.toLowerCase())){
+                            this.services_filtered.splice(i,1)
+                            break
+                        }
+                    }
+                }
+            }
         },
         deleteRow:function(index){
             var self=this
@@ -130,7 +159,7 @@ module.exports = {
             }).then( function (result) {
                 if(result.value){
                     var params={
-                        id: self.services[index].id
+                        id: self.services_filtered[index].id
                     }
                     Utils.apiCall("delete", "/kong/services",params)
                     .then(function (response) {
@@ -155,6 +184,8 @@ module.exports = {
                     response.data.data[i].custom_data=moment.unix(response.data.data[i].created_at).format("MM-DD-YYYY HH:mm:ss")
                 }
                 self.services=response.data.data
+                self.services_filtered=self.services
+                self.filter()
             });
         },
     },

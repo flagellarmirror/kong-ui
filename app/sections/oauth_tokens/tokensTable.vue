@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="tokens"
+        :items="tokens_filtered"
         :sort-by.sync="sortBy"
         :sort-desc.sync="sortDesc"
         :items-per-page="5"
@@ -17,6 +17,9 @@
                             solo
                             dense
                             hide-details
+                            clearable
+                            @input="filter()"
+                            v-model="head.custom.value"
                         ></v-text-field>
                         <v-btn
                             v-if="head.custom.type=='btn'"
@@ -60,6 +63,7 @@ module.exports = {
             sortBy: 'custom_data',
             sortDesc: true,
             tokens:[],
+            tokens_filtered:[],
             headers: [
                 {
                     text: 'Actions',
@@ -75,42 +79,48 @@ module.exports = {
                     align: 'start',
                     value: 'id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Authenticated user',
                     value: 'authenticated_userid',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Scopes',
                     value: 'scope',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Credential id',
                     value: 'credential_id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Service id',
                     value: 'service_id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Created at',
                     value: 'custom_data',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
             ],
@@ -118,7 +128,26 @@ module.exports = {
     },
     methods: {
         sendEvent:function(index){
-            this.$emit('event',this.tokens[index].id)
+            this.$emit('event',this.tokens_filtered[index].id)
+        },
+        filter:function(){
+            this.tokens_filtered=JSON.parse(JSON.stringify(this.tokens))
+            for(var i=this.tokens_filtered.length-1;i>=0;i--){
+                for(var k=1;k<this.headers.length;k++){
+                    if(this.tokens_filtered[i][this.headers[k].value]==null) {
+                        if(this.headers[k].custom.value!=null&&this.headers[k].custom.value!=''){
+                            this.tokens_filtered.splice(i,1)
+                            break
+                        }
+                    }else{
+                        if(this.headers[k].custom.value==null) continue
+                        if(!this.tokens_filtered[i][this.headers[k].value].toLowerCase().includes(this.headers[k].custom.value.toLowerCase())){
+                            this.tokens_filtered.splice(i,1)
+                            break
+                        }
+                    }
+                }
+            }
         },
         deleteRow:function(index){
             var self=this
@@ -134,7 +163,7 @@ module.exports = {
             }).then( function (result) {
                 if(result.value){
                     var params={
-                        id: self.tokens[index].id
+                        id: self.tokens_filtered[index].id
                     }
                     Utils.apiCall("delete", "/kong/tokens",params)
                     .then(function (response) {
@@ -168,6 +197,8 @@ module.exports = {
                     tmp.push(response.data.data[i])
                 }
                 self.tokens=tmp
+                self.tokens_filtered=self.tokens
+                self.filter()
             });
         }
     },

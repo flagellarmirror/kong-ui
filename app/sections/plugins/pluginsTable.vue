@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="plugins"
+        :items="plugins_filtered"
         :items-per-page="5"
         class="elevation-1"
         dense
@@ -15,13 +15,16 @@
                             solo
                             dense
                             hide-details
+                            clearable
+                            v-model="head.custom.value"
+                            @input="filter()"
                         ></v-text-field>
                         <v-btn
                             v-if="head.custom.type=='btn'"
                             icon
                             @click="$emit('event',null)"
                         >
-                        <v-icon>mdi-plus</v-icon>
+                            <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </th>
                 </template>
@@ -56,6 +59,7 @@ module.exports = {
     data:function(){
         return{
             plugins:[],
+            plugins_filtered:[],
             headers: [
                 {
                     text: 'Actions',
@@ -71,35 +75,40 @@ module.exports = {
                     align: 'start',
                     value: 'id',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Name',
                     value: 'name',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Enabled',
                     value: 'enabled',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Protocols',
                     value: 'protocols',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
                 {
                     text: 'Created at',
                     value: 'custom_data',
                     custom:{
-                        type:"text"
+                        type:"text",
+                        value:null,
                     }
                 },
             ],
@@ -108,7 +117,26 @@ module.exports = {
     props:['item'],
     methods: {
         sendEvent:function(index){
-            this.$emit('event',this.plugins[index].id)
+            this.$emit('event',this.plugins_filtered[index].id)
+        },
+        filter:function(){
+            this.plugins_filtered=JSON.parse(JSON.stringify(this.plugins))
+            for(var i=this.plugins_filtered.length-1;i>=0;i--){
+                for(var k=1;k<this.headers.length;k++){
+                    if(this.plugins_filtered[i][this.headers[k].value]==null) {
+                        if(this.headers[k].custom.value!=null&&this.headers[k].custom.value!=''){
+                            this.plugins_filtered.splice(i,1)
+                            break
+                        }
+                    }else{
+                        if(this.headers[k].custom.value==null) continue
+                        if(!this.plugins_filtered[i][this.headers[k].value].toLowerCase().includes(this.headers[k].custom.value.toLowerCase())){
+                            this.plugins_filtered.splice(i,1)
+                            break
+                        }
+                    }
+                }
+            }
         },
         deleteRow:function(index){
             var self=this
@@ -124,7 +152,7 @@ module.exports = {
             }).then( function (result) {
                 if(result.value){
                     var params={
-                        id: self.plugins[index].id
+                        id: self.plugins_filtered[index].id
                     }
                     Utils.apiCall("delete", "/kong/plugins",params)
                     .then(function (response) {
@@ -155,6 +183,8 @@ module.exports = {
                     tmp.push(response.data.data[i])
                 }
                 self.plugins=tmp
+                self.plugins_filtered=self.plugins
+                self.filter()
             });
         }
     },
